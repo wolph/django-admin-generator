@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Readme &mdash; Django admin generator 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Django admin generator 1.0 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to python_utils’s documentation!" href="index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to python_utils’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django admin generator 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="readme">
+<h1>Readme<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<a class="reference external image-reference" href="https://travis-ci.org/WoLpH/django-admin-generator"><img alt="Test Status" src="https://travis-ci.org/WoLpH/django-admin-generator.png?branch=master" /></a>
+<a class="reference external image-reference" href="https://coveralls.io/r/WoLpH/django-admin-generator?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/WoLpH/django-admin-generator/badge.png?branch=master" /></a>
+<a class="reference external image-reference" href="https://landscape.io/github/WoLpH/django-statsd/master"><img alt="Code Health" src="https://landscape.io/github/WoLpH/django-statsd/master/landscape.png" /></a>
+<a class="reference external image-reference" href="https://requires.io/github/WoLpH/django-admin-generator/requirements/?branch=master"><img alt="Requirements Status" src="https://requires.io/github/WoLpH/django-admin-generator/requirements.png?branch=master" /></a>
+<p>The Django Admin Generator is a project which can automatically generate
+(scaffold) a Django Admin for you. By doing this it will introspect your
+models and automatically generate an Admin with properties like:</p>
+<blockquote>
+<div><ul class="simple">
+<li><cite>list_display</cite> for all local fields</li>
+<li><cite>list_filter</cite> for foreign keys with few items</li>
+<li><cite>raw_id_fields</cite> for foreign keys with a lot of items</li>
+<li><cite>search_fields</cite> for name and <cite>slug</cite> fields</li>
+<li><cite>prepopulated_fields</cite> for <cite>slug</cite> fields</li>
+<li><cite>date_hierarchy</cite> for <cite>created_at</cite>, <cite>updated_at</cite> or <cite>joined_at</cite> fields</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="install">
+<h2>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h2>
+<p>To install simply execute <cite>python setup.py install</cite> in the source directory or
+<cite>pip install django-admin-generator</cite>.
+If you want to run the tests first, run <cite>py.test</cite></p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>To generate an admin for a given app:</p>
+<blockquote>
+<div>./manage.py admin_generator &lt;APP_NAME&gt; &gt;&gt; &lt;APP_NAME&gt;/admin.py</div></blockquote>
+<p>To generate an admin for a given app with all models starting with user:</p>
+<blockquote>
+<div>./manage.py admin_generator &lt;APP_NAME&gt; &#8216;^user&#8217; &gt;&gt; &lt;APP_NAME&gt;/admin.py</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Readme</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#install">Install</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to python_utils&#8217;s documentation!</a></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2014,  <a href="http://wol.ph/">Rick van Hattem</a>.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+    </div>
+  </body>
+</html>

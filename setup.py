@@ -1,6 +1,6 @@
 import os
 import sys
-import django_admin_generator as metadata
+from django_admin_generator import metadata
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
