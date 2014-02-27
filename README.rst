@@ -16,6 +16,10 @@ Introduction
    :target: https://landscape.io/github/WoLpH/django-statsd/master
    :alt: Code Health
 
+.. image:: https://requires.io/github/WoLpH/django-admin-generator/requirements.png?branch=master
+   :target: https://requires.io/github/WoLpH/django-admin-generator/requirements/?branch=master
+   :alt: Requirements Status
+
 The Django Admin Generator is a project which can automatically generate
 (scaffold) a Django Admin for you. By doing this it will introspect your
 models and automatically generate an Admin with properties like:
