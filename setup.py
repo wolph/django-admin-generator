@@ -36,5 +36,8 @@ setup(
     cmdclass={'test': PyTest},
     py_modules=['django_admin_generator'],
     classifiers=['License :: OSI Approved :: BSD License'],
+    install_requires=[
+        'django-utils2>=1.5.0',
+    ]
 )
 
