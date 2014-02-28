@@ -46,8 +46,8 @@ class %(name)sAdmin(admin.ModelAdmin):
 
 PRINT_ADMIN_REGISTRATION_METHOD = '''
 
-def _register(model, admin):
-    admin.site.register(model, admin)
+def _register(model, admin_class):
+    admin.site.register(model, admin_class)
 
 '''
 
