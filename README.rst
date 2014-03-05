@@ -12,8 +12,8 @@ Introduction
     :alt: Coverage Status
     :target: https://coveralls.io/r/WoLpH/django-admin-generator?branch=master
 
-.. image:: https://landscape.io/github/WoLpH/django-statsd/master/landscape.png
-   :target: https://landscape.io/github/WoLpH/django-statsd/master
+.. image:: https://landscape.io/github/WoLpH/django-admin-generator/master/landscape.png
+   :target: https://landscape.io/github/WoLpH/django-admin-generator/master
    :alt: Code Health
 
 .. image:: https://requires.io/github/WoLpH/django-admin-generator/requirements.png?branch=master

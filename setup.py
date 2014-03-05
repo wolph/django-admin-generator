@@ -7,7 +7,8 @@ from setuptools.command.test import test as TestCommand
 if os.path.isfile('README.rst'):
     long_description = open('README.rst').read()
 else:
-    long_description = 'See http://pypi.python.org/pypi/formatter/'
+    long_description = 'See http://pypi.python.org/pypi/%s/' % (
+        metadata.__package_name__)
 
 
 class PyTest(TestCommand):
