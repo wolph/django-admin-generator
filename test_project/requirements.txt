@@ -2,12 +2,12 @@ Django==1.6.2
 Jinja2==2.7.2
 MarkupSafe==0.18
 Pygments==1.6
-Sphinx==1.2.1
+Sphinx==1.2.2
 Sphinx-PyPI-upload==0.2.1
 anyjson==0.3.3
 cov-core==1.7
 coverage==3.7.1
-django-utils2==1.6.0
+django-utils2==1.6.1
 docutils==0.11
 execnet==1.2.0
 pep8==1.4.6
