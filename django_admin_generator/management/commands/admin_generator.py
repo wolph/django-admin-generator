@@ -313,7 +313,6 @@ class Command(base_command.CustomBaseCommand):
     )
     can_import_settings = True
     requires_system_checks = True
-    requires_model_validation = True
 
     def handle(self, *args, **kwargs):
         super(Command, self).handle(*args, **kwargs)
