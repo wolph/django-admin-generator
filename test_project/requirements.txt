@@ -10,9 +10,9 @@ coverage==3.7.1
 django-utils2==1.6.1
 docutils==0.11
 execnet==1.2.0
-pep8==1.4.6
+pep8==1.5.0
 py==1.4.20
-pyflakes==0.7.3
+pyflakes==0.8
 pytest==2.5.2
 pytest-cache==1.0
 pytest-cov==1.6
