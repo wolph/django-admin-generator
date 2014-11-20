@@ -5,6 +5,7 @@ python:
   - "3.2"
   - "3.3"
   - "pypy"
+  - "pypy3"
 # command to install dependencies
 install:
   - pip install -r test_project/requirements.txt --use-mirrors
