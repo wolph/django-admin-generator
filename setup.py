@@ -1,7 +1,8 @@
 import os
 import sys
+import setuptools
+
 from django_admin_generator import metadata
-from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 if os.path.isfile('README.rst'):
@@ -23,7 +24,7 @@ class PyTest(TestCommand):
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
-setup(
+setuptools.setup(
     name=metadata.__package_name__,
     version=metadata.__version__,
     author=metadata.__author__,
@@ -31,7 +32,7 @@ setup(
     description=metadata.__description__,
     url=metadata.__url__,
     license='BSD',
-    packages=find_packages(),
+    packages=setuptools.find_packages(),
     long_description=long_description,
     tests_require=['pytest'],
     cmdclass={'test': PyTest},
@@ -39,6 +40,7 @@ setup(
     classifiers=['License :: OSI Approved :: BSD License'],
     install_requires=[
         'django-utils2>=1.7.1',
+        'six',
     ]
 )
 

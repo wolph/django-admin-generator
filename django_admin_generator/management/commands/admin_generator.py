@@ -1,5 +1,6 @@
 import re
 import sys
+import six
 import optparse
 from django_utils.management.commands import base_command
 from django.db.models.loading import get_models
@@ -72,7 +73,6 @@ class AdminApp(object):
     def __iter__(self):
         for model in get_models(self.app):
             admin_model = AdminModel(model, **self.options)
-            #assert self.app == admin_model.name
 
             for model_re in self.model_res:
                 if model_re.search(admin_model.name):
@@ -84,10 +84,13 @@ class AdminApp(object):
             yield admin_model
 
     def __unicode__(self):
-        return ''.join(self._unicode_generator())
+        return six.u('').join(self._unicode_generator())
 
-    def __str__(self):
-        return unicode(self).encode('utf-8', 'replace')
+    def __str__(self):  # pragma: no cover
+        if six.PY2:
+            return six.text_type(self).encode('utf-8', 'replace')
+        else:
+            return self.__unicode__()
 
     def _unicode_generator(self):
         yield PRINT_IMPORTS
@@ -164,7 +167,7 @@ class AdminModel(object):
         parent_fields = meta.parents.values()
         for field in meta.fields:
             name = self._process_field(field, parent_fields)
-            if name:
+            if name:  # pragma: no cover
                 yield name
 
     def _process_foreign_key(self, field):
@@ -184,7 +187,7 @@ class AdminModel(object):
             pass  # Do nothing :)
 
     def _process_field(self, field, parent_fields):
-        if field in parent_fields:
+        if field in parent_fields:  # pragma: no cover
             return
 
         self.list_display.append(field.name)
@@ -199,18 +202,21 @@ class AdminModel(object):
 
         return field.name
 
-    def __str__(self):
-        return unicode(self).encode('utf-8', 'replace')
+    def __str__(self):  # pragma: no cover
+        if six.PY2:
+            return six.text_type(self).encode('utf-8', 'replace')
+        else:
+            return self.__unicode__()
 
     def __unicode__(self):
-        return ''.join(self._unicode_generator())
+        return six.u('').join(self._unicode_generator())
 
     def _yield_value(self, key, value):
         if isinstance(value, (list, set, tuple)):
             return self._yield_tuple(key, tuple(value))
         elif isinstance(value, dict):
             return self._yield_dict(key, value)
-        elif isinstance(value, basestring):
+        elif isinstance(value, six.string_types):
             return self._yield_string(key, value)
         else:  # pragma: no cover
             raise TypeError('%s is not supported in %r' % (type(value), value))
@@ -226,11 +232,11 @@ class AdminModel(object):
         row = self._yield_string(key, value)
         if len(row) > MAX_LINE_WIDTH:
             row_parts.append(self._yield_string(key, '{', str))
-            for k, v in value.iteritems():
+            for k, v in six.iteritems(value):
                 row_parts.append('%s%r: %r' % (2 * INDENT_WIDTH * ' ', k, v))
 
             row_parts.append(INDENT_WIDTH * ' ' + '}')
-            row = '\n'.join(row_parts)
+            row = six.u('\n').join(row_parts)
 
         return row
 
@@ -243,7 +249,7 @@ class AdminModel(object):
                 row_parts.append(2 * INDENT_WIDTH * ' ' + repr(v) + ',')
 
             row_parts.append(INDENT_WIDTH * ' ' + ')')
-            row = '\n'.join(row_parts)
+            row = six.u('\n').join(row_parts)
 
         return row
 
@@ -327,10 +333,11 @@ class Command(base_command.CustomBaseCommand):
 
         app = installed_apps.get(args[0])
         if not app:
-            self.warn('This command requires an existing app name as argument')
-            self.warn('Available apps:')
+            self.warning('This command requires an existing app name as '
+                         'argument')
+            self.warning('Available apps:')
             for app in sorted(installed_apps):
-                self.warn('    %s' % app)
+                self.warning('    %s' % app)
             sys.exit(1)
 
         model_res = []
@@ -340,6 +347,6 @@ class Command(base_command.CustomBaseCommand):
         self.handle_app(app, model_res, **kwargs)
 
     def handle_app(self, app, model_res, **options):
-        print AdminApp(app, model_res, **options)
+        print(AdminApp(app, model_res, **options))
 
 

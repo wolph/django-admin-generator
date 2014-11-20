@@ -1,3 +1,4 @@
+import six
 import pytest
 
 from django_admin_generator.management.commands import admin_generator
@@ -31,18 +32,14 @@ def test_no_args(command):
 def check_output(capsys):
     out, err = capsys.readouterr()
     # Strip out encodings (and all other comments) so `compile` doesn't break
-    out = '\n'.join(line for line in out.split('\n')
-                    if not line.startswith('#'))
+    out = six.u('\n').join(line for line in out.split('\n')
+                           if not line.startswith('#'))
     compile(out, 'admin.py', 'exec')
 
 
 @pytest.mark.django_db
 def test_app(command, capsys, monkeypatch):
     command = admin_generator.Command()
-    #command.handle(
-    #    'test_project.test_app',
-    #    'ACollectionOfSpamAndEggsAndOtherStuff',
-    #    **DEFAULTS)
     command.handle('test_project.test_app', **DEFAULTS)
     check_output(capsys)
 

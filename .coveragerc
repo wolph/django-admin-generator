@@ -15,4 +15,5 @@ source = django_admin_generator
 branch = True
 omit =
     */test_project/*
+    */metadata.py
 
