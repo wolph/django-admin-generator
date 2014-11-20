@@ -34,9 +34,12 @@ models and automatically generate an Admin with properties like:
 Install
 -------
 
-To install simply execute `python setup.py install` in the source directory or
-`pip install django-admin-generator`.
-If you want to run the tests first, run `py.test`
+To install:
+
+ 1. Run `pip install django-admin-generator` or execute `python setup.py install` in the source directory
+ 2. Add `django_admin_generator` to your `INSTALLED_APPS`
+ 
+If you want to run the tests, run `py.test` (requires `pytest`)
 
 Usage
 -----
