@@ -42,6 +42,8 @@ Links
     - https://github.com/WoLpH/django-admin-generator/issues
 * Package homepage
     - https://pypi.python.org/pypi/django-admin-generator
+* My blog
+    - http://w.wol.ph/
 
 Install
 -------
