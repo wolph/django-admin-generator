@@ -33,6 +33,7 @@ PREPOPULATED_FIELD_NAMES = (
 
 LIST_FILTER_THRESHOLD = 25
 RAW_ID_THRESHOLD = 100
+NO_QUERY_DB = False
 
 PRINT_IMPORTS = '''# vim: set fileencoding=utf-8 :
 import models
@@ -132,7 +133,8 @@ class AdminModel(object):
                  list_filter_threshold=LIST_FILTER_THRESHOLD,
                  search_field_names=SEARCH_FIELD_NAMES,
                  date_hierarchy_names=DATE_HIERARCHY_NAMES,
-                 prepopulated_field_names=PREPOPULATED_FIELD_NAMES, **options):
+                 prepopulated_field_names=PREPOPULATED_FIELD_NAMES,
+                 no_query_db=NO_QUERY_DB, **options):
         self.model = model
         self.list_display = []
         self.list_filter = []
@@ -145,6 +147,7 @@ class AdminModel(object):
         self.list_filter_threshold = list_filter_threshold
         self.date_hierarchy_names = date_hierarchy_names
         self.prepopulated_field_names = prepopulated_field_names
+        self.query_db = not no_query_db
 
     def __repr__(self):
         return '<%s[%s]>' % (
@@ -159,8 +162,7 @@ class AdminModel(object):
     def _process_many_to_many(self, meta):
         raw_id_threshold = self.raw_id_threshold
         for field in meta.local_many_to_many:
-            related_model = getattr(field.related, 'related_model',
-                                    field.related.model)
+            related_model = getattr(field.related, 'related_model', field.related.model)
             related_objects = related_model.objects.all()
             if(related_objects[:raw_id_threshold].count() < raw_id_threshold):
                 yield field.name
@@ -176,8 +178,7 @@ class AdminModel(object):
         raw_id_threshold = self.raw_id_threshold
         list_filter_threshold = self.list_filter_threshold
         max_count = max(list_filter_threshold, raw_id_threshold)
-        related_model = getattr(field.related, 'related_model',
-                                field.related.model)
+        related_model = getattr(field.related, 'related_model', field.related.model)
         related_count = related_model.objects.all()
         related_count = related_count[:max_count].count()
 
@@ -196,7 +197,7 @@ class AdminModel(object):
 
         self.list_display.append(field.name)
         if isinstance(field, LIST_FILTER):
-            if isinstance(field, models.ForeignKey):
+            if isinstance(field, models.ForeignKey) and self.query_db:
                 self._process_foreign_key(field)
             else:
                 self.list_filter.append(field.name)
@@ -267,7 +268,8 @@ class AdminModel(object):
     def _process(self):
         meta = self.model._meta
 
-        self.raw_id_fields += list(self._process_many_to_many(meta))
+        if self.query_db:
+            self.raw_id_fields += list(self._process_many_to_many(meta))
         field_names = list(self._process_fields(meta))
 
         for field_name in self.date_hierarchy_names[::-1]:
@@ -320,6 +322,10 @@ class Command(base_command.CustomBaseCommand):
             default=RAW_ID_THRESHOLD, metavar='RAW_ID_THRESHOLD',
             help='If a foreign key has more than RAW_ID_THRESHOLD items '
             'it will be added to `list_filter` [default: %default]'),
+        optparse.make_option(
+            '-n', '--no-query-db', action="store_true", dest='no_query_db',
+            help='Don\'t query the database in order to decide whether '
+            'relationships are added to `list_filter`'),
     )
     can_import_settings = True
     requires_system_checks = True
