@@ -73,3 +73,9 @@ def test_auth_user_filter(command, capsys):
     command.handle('django.contrib.auth', 'user', **DEFAULTS_FILTERED)
     check_output(capsys)
 
+
+def test_no_database(command, capsys):
+    command.handle('django.contrib.auth', 'user', no_query_db=True,
+                   **DEFAULTS_FILTERED)
+    check_output(capsys)
+

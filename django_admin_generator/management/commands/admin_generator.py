@@ -162,7 +162,8 @@ class AdminModel(object):
     def _process_many_to_many(self, meta):
         raw_id_threshold = self.raw_id_threshold
         for field in meta.local_many_to_many:
-            related_model = getattr(field.related, 'related_model', field.related.model)
+            related_model = getattr(field.related, 'related_model',
+                                    field.related.model)
             related_objects = related_model.objects.all()
             if(related_objects[:raw_id_threshold].count() < raw_id_threshold):
                 yield field.name
@@ -178,7 +179,8 @@ class AdminModel(object):
         raw_id_threshold = self.raw_id_threshold
         list_filter_threshold = self.list_filter_threshold
         max_count = max(list_filter_threshold, raw_id_threshold)
-        related_model = getattr(field.related, 'related_model', field.related.model)
+        related_model = getattr(field.related, 'related_model',
+                                field.related.model)
         related_count = related_model.objects.all()
         related_count = related_count[:max_count].count()
 
