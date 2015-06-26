@@ -8,7 +8,7 @@ Introduction
     :alt: Test Status
     :target: https://travis-ci.org/WoLpH/django-admin-generator
 
-.. image:: https://coveralls.io/repos/WoLpH/django-admin-generator/badge.png?branch=master
+.. image:: https://coveralls.io/repos/WoLpH/django-admin-generator/badge.svg?branch=master
     :alt: Coverage Status
     :target: https://coveralls.io/r/WoLpH/django-admin-generator?branch=master
 
