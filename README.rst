@@ -4,7 +4,7 @@ Readme
 Introduction
 ------------
 
-.. image:: https://travis-ci.org/WoLpH/django-admin-generator.png?branch=master
+.. image:: https://travis-ci.org/WoLpH/django-admin-generator.svg?branch=master
     :alt: Test Status
     :target: https://travis-ci.org/WoLpH/django-admin-generator
 
