@@ -36,7 +36,7 @@ RAW_ID_THRESHOLD = 100
 NO_QUERY_DB = False
 
 PRINT_IMPORTS = '''# vim: set fileencoding=utf-8 :
-import models
+import {app_name}
 from django.contrib import admin
 '''
 
@@ -54,12 +54,12 @@ def _register(model, admin_class):
 '''
 
 PRINT_ADMIN_REGISTRATION = '''
-_register(models.%(name)s, %(name)sAdmin)'''
+_register({app_name}.{name}, {name}Admin)'''
 
 PRINT_ADMIN_REGISTRATION_LONG = '''
 _register(
-    models.%(name)s,
-    %(name)sAdmin)'''
+    {app_name}.{name},
+    {name}Admin)'''
 
 PRINT_ADMIN_PROPERTY = '''
     %(key)s = %(value)s'''
@@ -94,7 +94,8 @@ class AdminApp(object):
             return self.__unicode__()
 
     def _unicode_generator(self):
-        yield PRINT_IMPORTS
+
+        yield PRINT_IMPORTS.format(app_name=str(self.app.__name__))
 
         admin_model_names = []
         for admin_model in self:
@@ -107,9 +108,9 @@ class AdminApp(object):
         yield PRINT_ADMIN_REGISTRATION_METHOD
 
         for name in admin_model_names:
-            row = PRINT_ADMIN_REGISTRATION % dict(name=name)
+            row = PRINT_ADMIN_REGISTRATION.format(app_name=str(self.app.__name__),name=name)
             if len(row) > MAX_LINE_WIDTH:
-                row = PRINT_ADMIN_REGISTRATION_LONG % dict(name=name)
+                row = PRINT_ADMIN_REGISTRATION_LONG.format(app_name=str(self.app.__name__),name=name)
             yield row
 
     def __repr__(self):
@@ -360,5 +361,3 @@ class Command(base_command.CustomBaseCommand):
 
     def handle_app(self, app, model_res, **options):
         print(AdminApp(app, model_res, **options))
-
-
