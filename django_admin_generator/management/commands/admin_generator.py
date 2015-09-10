@@ -36,7 +36,7 @@ RAW_ID_THRESHOLD = 100
 NO_QUERY_DB = False
 
 PRINT_IMPORTS = '''# vim: set fileencoding=utf-8 :
-import models
+from . import models
 from django.contrib import admin
 '''
 
