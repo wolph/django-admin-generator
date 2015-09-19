@@ -332,6 +332,13 @@ class Command(base_command.CustomBaseCommand):
     can_import_settings = True
     requires_system_checks = True
 
+    def warning(self, message):
+        # This replaces the regular warning method from the CustomBaseCommand
+        # since some Django installations capture all logging output
+        # unfortunately
+        sys.stderr.write(message)
+        sys.stderr.write('\n')
+
     def handle(self, *args, **kwargs):
         super(Command, self).handle(*args, **kwargs)
 
