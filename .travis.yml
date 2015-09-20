@@ -5,7 +5,6 @@ python: 2.7
 cache: pip
 
 env:
-    - TOX_ENV=coveralls
     - TOX_ENV=py26-django14
     - TOX_ENV=py26-django15
     - TOX_ENV=py26-django16
@@ -23,10 +22,11 @@ env:
     - TOX_ENV=pypy3-django15
     - TOX_ENV=pypy3-django16
     - TOX_ENV=pypy3-django18
+      #     - TOX_ENV=coveralls
 
 install:
-    pip install --upgrade pip
-    pip install tox
+    - pip install --upgrade pip
+    - pip install tox
 
 script:
     tox -e $TOX_ENV
