@@ -1,3 +1,4 @@
+sudo: false
 language: python
 python: 2.7
 
@@ -21,7 +22,7 @@ env:
     - TOX_ENV=pypy3-django15
     - TOX_ENV=pypy3-django16
     - TOX_ENV=pypy3-django18
-    - TOX_ENV=coveralls
+      #     - TOX_ENV=coveralls
 
 install:
     - pip install --upgrade pip
