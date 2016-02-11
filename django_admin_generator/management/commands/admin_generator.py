@@ -3,7 +3,6 @@ import sys
 import six
 import optparse
 from django_utils.management.commands import base_command
-from django.db.models.loading import get_models
 from django.db import models
 
 MAX_LINE_WIDTH = 78
@@ -65,6 +64,29 @@ _register(
 PRINT_ADMIN_PROPERTY = '''
     %(key)s = %(value)s'''
 
+#Account for removed functions in newer versions of django
+try:
+    from django.apps import apps
+    get_model = apps.get_model
+except:
+    from django.db.models.loading import get_model
+
+try:
+    from django.conf import settings
+    class NameClass:
+        def __init__(self, name):
+            self.__name__=name
+    def get_apps():
+        return (NameClass(app_name) for app_name in settings.INSTALLED_APPS)
+    get_apps() #Make sure no error is thrown
+except:
+    get_apps=models.get_apps
+
+try:
+    get_models=apps.get_models
+except:
+    get_models=models.get_models
+#End of version upgrade code
 
 class AdminApp(object):
     def __init__(self, app, model_res, **options):
@@ -345,7 +367,7 @@ class Command(base_command.CustomBaseCommand):
 
         installed_apps = dict(
             (a.__name__.rsplit('.', 1)[0], a)
-            for a in models.get_apps())
+            for a in get_apps())
 
         # Make sure we always have args
         if not args:
