@@ -3,8 +3,25 @@ import sys
 import six
 import optparse
 from django_utils.management.commands import base_command
-from django.db.models.loading import get_models
 from django.db import models
+
+try:  # pragma: no cover
+    from django.db.models.loading import get_models
+except ImportError:  # pragma: no cover
+    def get_models(app):
+        for model in app.get_models():
+            yield model
+
+if hasattr(models, 'get_apps'):  # pragma: no cover
+    def get_apps():
+        for app in models.get_apps():
+            yield app.__name__.rsplit('.', 1)[0], app
+else:  # pragma: no cover
+    from django.apps.registry import apps
+
+    def get_apps():
+        for app_config in apps.get_app_configs():
+            yield app_config.name, app_config
 
 MAX_LINE_WIDTH = 78
 INDENT_WIDTH = 4
@@ -343,9 +360,7 @@ class Command(base_command.CustomBaseCommand):
     def handle(self, *args, **kwargs):
         super(Command, self).handle(*args, **kwargs)
 
-        installed_apps = dict(
-            (a.__name__.rsplit('.', 1)[0], a)
-            for a in models.get_apps())
+        installed_apps = dict(get_apps())
 
         # Make sure we always have args
         if not args:
