@@ -1,5 +1,5 @@
 __package_name__ = 'django-admin-generator'
-__version__ = '1.4.0'
+__version__ = '1.5.0'
 __author__ = 'Rick van Hattem'
 __author_email__ = 'Wolph@Wol.ph'
 __description__ = '''Django Admin Generator is a management command to
