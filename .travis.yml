@@ -5,24 +5,27 @@ python: 2.7
 cache: pip
 
 env:
-    - TOX_ENV=py26-django14
-    - TOX_ENV=py26-django15
-    - TOX_ENV=py26-django16
+    - TOX_ENV=coveralls
     - TOX_ENV=py27-django14
     - TOX_ENV=py27-django15
     - TOX_ENV=py27-django16
     - TOX_ENV=py27-django18
+    - TOX_ENV=py27-django19
     - TOX_ENV=py34-django15
     - TOX_ENV=py34-django16
     - TOX_ENV=py34-django18
+    - TOX_ENV=py34-django19
+    - TOX_ENV=py35-django18
+    - TOX_ENV=py35-django19
     - TOX_ENV=pypy-django14
     - TOX_ENV=pypy-django15
     - TOX_ENV=pypy-django16
     - TOX_ENV=pypy-django18
+    - TOX_ENV=pypy-django19
     - TOX_ENV=pypy3-django15
     - TOX_ENV=pypy3-django16
     - TOX_ENV=pypy3-django18
-    - TOX_ENV=coveralls
+    - TOX_ENV=pypy3-django19
 
 install:
     - pip install --upgrade pip
