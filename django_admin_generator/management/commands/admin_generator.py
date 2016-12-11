@@ -1,7 +1,6 @@
 import re
 import sys
 import six
-import optparse
 from django_utils.management.commands import base_command
 from django.db import models
 
@@ -180,8 +179,7 @@ class AdminModel(object):
     def _process_many_to_many(self, meta):
         raw_id_threshold = self.raw_id_threshold
         for field in meta.local_many_to_many:
-            related_model = getattr(field.related, 'related_model',
-                                    field.related.model)
+            related_model = self._get_related_model(field)
             related_objects = related_model.objects.all()
             if(related_objects[:raw_id_threshold].count() < raw_id_threshold):
                 yield field.name
@@ -193,12 +191,22 @@ class AdminModel(object):
             if name:  # pragma: no cover
                 yield name
 
+    @classmethod
+    def _get_related_model(cls, field):  # pragma: no cover
+        if hasattr(field, 'remote_field'):
+            related_model = field.remote_field.model
+        elif hasattr(field.related, 'related_model'):
+            related_model = field.related.related_model
+        else:
+            related_model = field.related.model
+
+        return related_model
+
     def _process_foreign_key(self, field):
         raw_id_threshold = self.raw_id_threshold
         list_filter_threshold = self.list_filter_threshold
         max_count = max(list_filter_threshold, raw_id_threshold)
-        related_model = getattr(field.related, 'related_model',
-                                field.related.model)
+        related_model = self._get_related_model(field)
         related_count = related_model.objects.all()
         related_count = related_count[:max_count].count()
 
@@ -315,40 +323,48 @@ class AdminModel(object):
 
 class Command(base_command.CustomBaseCommand):
     help = '''Generate a `admin.py` file for the given app (models)'''
-    option_list = base_command.CustomBaseCommand.option_list + (
-        optparse.make_option(
+    can_import_settings = True
+    requires_system_checks = True
+
+    def add_arguments(self, parser):
+        super(Command, self).add_arguments(parser)
+
+        parser.add_argument(
             '-s', '--search-field', action='append',
             default=SEARCH_FIELD_NAMES,
             help='Fields named like this will be added to `search_fields`'
-            ' [default: %default]'),
-        optparse.make_option(
+            ' [default: %default]')
+        parser.add_argument(
             '-d', '--date-hierarchy', action='append',
             default=DATE_HIERARCHY_NAMES,
             help='A field named like this will be set as `date_hierarchy`'
-            ' [default: %default]'),
-        optparse.make_option(
+            ' [default: %default]')
+        parser.add_argument(
             '-p', '--prepopulated-fields', action='append',
             default=PREPOPULATED_FIELD_NAMES,
             help='These fields will be prepopulated by the other field.'
             'The field names can be specified like `spam=eggA,eggB,eggC`'
-            ' [default: %default]'),
-        optparse.make_option(
-            '-l', '--list-filter-threshold', type='int',
+            ' [default: %default]')
+        parser.add_argument(
+            '-l', '--list-filter-threshold', type=int,
             default=LIST_FILTER_THRESHOLD, metavar='LIST_FILTER_THRESHOLD',
             help='If a foreign key has less than LIST_FILTER_THRESHOLD items '
-            'it will be added to `list_filter` [default: %default]'),
-        optparse.make_option(
-            '-r', '--raw-id-threshold', type='int',
+            'it will be added to `list_filter` [default: %default]')
+        parser.add_argument(
+            '-r', '--raw-id-threshold', type=int,
             default=RAW_ID_THRESHOLD, metavar='RAW_ID_THRESHOLD',
             help='If a foreign key has more than RAW_ID_THRESHOLD items '
-            'it will be added to `list_filter` [default: %default]'),
-        optparse.make_option(
+            'it will be added to `list_filter` [default: %default]')
+        parser.add_argument(
             '-n', '--no-query-db', action="store_true", dest='no_query_db',
             help='Don\'t query the database in order to decide whether '
-            'relationships are added to `list_filter`'),
-    )
-    can_import_settings = True
-    requires_system_checks = True
+            'relationships are added to `list_filter`')
+        parser.add_argument(
+            'app',
+            help='App to generate admin definitions for')
+        parser.add_argument(
+            'models', nargs='*',
+            help='Regular expressions to filter the models by')
 
     def warning(self, message):
         # This replaces the regular warning method from the CustomBaseCommand
@@ -357,16 +373,12 @@ class Command(base_command.CustomBaseCommand):
         sys.stderr.write(message)
         sys.stderr.write('\n')
 
-    def handle(self, *args, **kwargs):
+    def handle(self, app=None, *args, **kwargs):
         super(Command, self).handle(*args, **kwargs)
 
         installed_apps = dict(get_apps())
 
-        # Make sure we always have args
-        if not args:
-            args = [False]
-
-        app = installed_apps.get(args[0])
+        app = installed_apps.get(app)
         if not app:
             self.warning('This command requires an existing app name as '
                          'argument')
@@ -376,8 +388,8 @@ class Command(base_command.CustomBaseCommand):
             sys.exit(1)
 
         model_res = []
-        for arg in args[1:]:
-            model_res.append(re.compile(arg, re.IGNORECASE))
+        for model in kwargs.get('models', []):
+            model_res.append(re.compile(model, re.IGNORECASE))
 
         self.handle_app(app, model_res, **kwargs)
 

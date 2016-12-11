@@ -52,9 +52,9 @@ Usage
 
 To generate an admin for a given app:
 
-    ./manage.py admin_generator <APP_NAME> >> <APP_NAME>/admin.py
+    ./manage.py admin_generator APP_NAME >> APP_NAME/admin.py
 
 To generate an admin for a given app with all models starting with user:
 
-    ./manage.py admin_generator <APP_NAME> '^user' >> <APP_NAME>/admin.py
+    ./manage.py admin_generator APP_NAME '^user' >> APP_NAME/admin.py
 
