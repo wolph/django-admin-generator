@@ -1,5 +1,5 @@
 Welcome to Django Admin Generator's documentation!
-========================================
+==================================================
 
 Contents:
 
