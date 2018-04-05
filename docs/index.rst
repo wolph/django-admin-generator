@@ -7,6 +7,7 @@ Contents:
    :maxdepth: 4
 
    usage
+   django_admin_generator
 
 Indices and tables
 ==================
