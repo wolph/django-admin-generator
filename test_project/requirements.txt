@@ -1,8 +1,1 @@
-six
-pytest
-pytest-cache
-pytest-cov
-pytest-django
-pytest-flakes
-pytest-pep8
-python-utils
+-e.[tests]
