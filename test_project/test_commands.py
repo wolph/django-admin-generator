@@ -5,6 +5,7 @@ from django_admin_generator.management.commands import admin_generator
 
 DEFAULTS = {
     'date_hierarchy_names': 'date_joined',
+    'date_hierarchy_threshold': 0,
     'list_filter_threshold': 0,
     'raw_id_threshold': 0,
     'prepopulated_field_names': (
@@ -15,6 +16,7 @@ DEFAULTS = {
 }
 
 DEFAULTS_FILTERED = DEFAULTS.copy()
+DEFAULTS_FILTERED['date_hierarchy_threshold'] = 250
 DEFAULTS_FILTERED['list_filter_threshold'] = 250
 DEFAULTS_FILTERED['raw_id_threshold'] = 250
 
