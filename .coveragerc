@@ -11,9 +11,17 @@ exclude_lines =
     if __name__ == .__main__.:
 
 [run]
-source = django_admin_generator
+source =
+    django_admin_generator
+    test_project
+
 branch = True
 omit =
     */test_project/*
     */metadata.py
+
+[paths]
+source =
+    django_admin_generator
+    test_project
 
