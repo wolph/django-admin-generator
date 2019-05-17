@@ -12,6 +12,7 @@ env:
     - TOX_ENV=py36-django20
     - TOX_ENV=flake8
     - TOX_ENV=docs
+    - TOX_ENV=coveralls
 
 install:
     - pip install --upgrade pip
