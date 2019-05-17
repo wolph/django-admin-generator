@@ -47,6 +47,7 @@ PREPOPULATED_FIELD_NAMES = (
     'slug=name',
 )
 
+DATE_HIERARCHY_THRESHOLD = 250
 LIST_FILTER_THRESHOLD = 25
 RAW_ID_THRESHOLD = 100
 NO_QUERY_DB = False
@@ -147,6 +148,7 @@ class AdminModel(object):
     )
 
     def __init__(self, model, raw_id_threshold=RAW_ID_THRESHOLD,
+                 date_hierarchy_threshold=DATE_HIERARCHY_THRESHOLD,
                  list_filter_threshold=LIST_FILTER_THRESHOLD,
                  search_field_names=SEARCH_FIELD_NAMES,
                  date_hierarchy_names=DATE_HIERARCHY_NAMES,
@@ -162,6 +164,7 @@ class AdminModel(object):
         self.search_field_names = search_field_names
         self.raw_id_threshold = raw_id_threshold
         self.list_filter_threshold = list_filter_threshold
+        self.date_hierarchy_threshold = date_hierarchy_threshold
         self.date_hierarchy_names = date_hierarchy_names
         self.prepopulated_field_names = prepopulated_field_names
         self.query_db = not no_query_db
@@ -295,15 +298,26 @@ class AdminModel(object):
 
     def _process(self):
         meta = self.model._meta
+        qs = self.model.objects.all()
 
         if self.query_db:
             self.raw_id_fields += list(self._process_many_to_many(meta))
+
         field_names = list(self._process_fields(meta))
 
-        for field_name in self.date_hierarchy_names[::-1]:
-            if field_name in field_names and not self.date_hierarchy:
-                self.date_hierarchy = field_name
-                break
+        if self.query_db:
+            threshold = self.list_filter_threshold + 1
+            for field in field_names:
+                distinct_count = len(qs.only(field).distinct()[:threshold])
+                if distinct_count <= self.list_filter_threshold:
+                    self.list_filter.append(field)
+
+        if self.query_db:
+            if qs.count() < self.date_hierarchy_threshold:
+                for field_name in self.date_hierarchy_names[::-1]:
+                    if field_name in field_names and not self.date_hierarchy:
+                        self.date_hierarchy = field_name
+                        break
 
         for k in sorted(self.prepopulated_field_names):
             k, vs = k.split('=', 1)
@@ -340,6 +354,12 @@ class Command(base_command.CustomBaseCommand):
             help='A field named like this will be set as `date_hierarchy`'
             ' [default: %default]')
         parser.add_argument(
+            '--date-hierarchy-threshold', type=int,
+            default=DATE_HIERARCHY_THRESHOLD,
+            metavar='DATE_HIERARCHY_THRESHOLD',
+            help='If a model has less than DATE_HIERARCHY_THRESHOLD items '
+            'it will be added to `date_hierarchy` [default: %default]')
+        parser.add_argument(
             '-p', '--prepopulated-fields', action='append',
             default=PREPOPULATED_FIELD_NAMES,
             help='These fields will be prepopulated by the other field.'
@@ -348,8 +368,8 @@ class Command(base_command.CustomBaseCommand):
         parser.add_argument(
             '-l', '--list-filter-threshold', type=int,
             default=LIST_FILTER_THRESHOLD, metavar='LIST_FILTER_THRESHOLD',
-            help='If a foreign key has less than LIST_FILTER_THRESHOLD items '
-            'it will be added to `list_filter` [default: %default]')
+            help='If a foreign key/field has less than LIST_FILTER_THRESHOLD '
+            'items it will be added to `list_filter` [default: %default]')
         parser.add_argument(
             '-r', '--raw-id-threshold', type=int,
             default=RAW_ID_THRESHOLD, metavar='RAW_ID_THRESHOLD',
@@ -358,7 +378,7 @@ class Command(base_command.CustomBaseCommand):
         parser.add_argument(
             '-n', '--no-query-db', action="store_true", dest='no_query_db',
             help='Don\'t query the database in order to decide whether '
-            'relationships are added to `list_filter`')
+            'fields/relationships are added to `list_filter`')
         parser.add_argument(
             'app',
             help='App to generate admin definitions for')
