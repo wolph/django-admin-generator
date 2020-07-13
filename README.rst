@@ -42,8 +42,8 @@ Install
 
 To install:
 
- 1. Run `pip install django-admin-generator` or execute `python setup.py install` in the source directory
- 2. Add `django_admin_generator` to your `INSTALLED_APPS`
+1. Run `pip install django-admin-generator` or execute `python setup.py install` in the source directory
+2. Add `django_admin_generator` to your `INSTALLED_APPS`
  
 If you want to run the tests, run `py.test` (requires `pytest`)
 
