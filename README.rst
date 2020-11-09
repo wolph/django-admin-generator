@@ -16,12 +16,12 @@ The Django Admin Generator is a project which can automatically generate
 (scaffold) a Django Admin for you. By doing this it will introspect your
 models and automatically generate an Admin with properties like:
 
- - `list_display` for all local fields
- - `list_filter` for foreign keys with few items
- - `raw_id_fields` for foreign keys with a lot of items
- - `search_fields` for name and `slug` fields
- - `prepopulated_fields` for `slug` fields
- - `date_hierarchy` for `created_at`, `updated_at` or `joined_at` fields
+ - ``list_display`` for all local fields
+ - ``list_filter`` for foreign keys with few items
+ - ``raw_id_fields`` for foreign keys with a lot of items
+ - ``search_fields`` for name and ``slug`` fields
+ - ``prepopulated_fields`` for ``slug`` fields
+ - ``date_hierarchy`` for ``created_at``, ``updated_at`` or ``joined_at`` fields
 
 Links
 -----
@@ -42,10 +42,10 @@ Install
 
 To install:
 
-1. Run `pip install django-admin-generator` or execute `python setup.py install` in the source directory
-2. Add `django_admin_generator` to your `INSTALLED_APPS`
+1. Run ``pip install django-admin-generator`` or execute ``python setup.py install`` in the source directory
+2. Add ``django_admin_generator`` to your ``INSTALLED_APPS``
  
-If you want to run the tests, run `py.test` (requires `pytest`)
+If you want to run the tests, run ``py.test`` (requires ``pytest``)
 
 Usage
 -----
