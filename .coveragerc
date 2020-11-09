@@ -17,6 +17,7 @@ source =
 
 branch = True
 omit =
+    */__about__.py
     */test_project/*
     */metadata.py
 
