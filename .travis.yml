@@ -3,7 +3,6 @@ cache: pip
 language: python
 python: 3.6
 
-# tox -l | awk '{print "    - TOX_ENV=" $1 }'
 env:
     - TOX_ENV=pypy-django11
     - TOX_ENV=py27-django11
@@ -13,21 +12,12 @@ env:
     - TOX_ENV=py36-django11
     - TOX_ENV=py36-django21
     - TOX_ENV=py36-django22
-    - TOX_ENV=py37-django11
-    - TOX_ENV=py37-django21
-    - TOX_ENV=py37-django22
-    - TOX_ENV=py38-django11
-    - TOX_ENV=py38-django21
-    - TOX_ENV=py38-django22
     - TOX_ENV=flake8
     - TOX_ENV=docs
-    # Don't forget coveralls, it's not listed by the command above
     - TOX_ENV=coveralls
 
 install:
-    - pip install --upgrade pip
     - pip install tox
 
 script:
-    tox -e $TOX_ENV
-
+    - tox -e $TOX_ENV
