@@ -346,35 +346,32 @@ class Command(base_command.CustomBaseCommand):
         parser.add_argument(
             '-s', '--search-field', action='append',
             default=SEARCH_FIELD_NAMES,
-            help='Fields named like this will be added to `search_fields`'
-            ' [default: %default]')
+            help='Fields named like this will be added to `search_fields`')
         parser.add_argument(
             '-d', '--date-hierarchy', action='append',
             default=DATE_HIERARCHY_NAMES,
-            help='A field named like this will be set as `date_hierarchy`'
-            ' [default: %default]')
+            help='A field named like this will be set as `date_hierarchy`')
         parser.add_argument(
             '--date-hierarchy-threshold', type=int,
             default=DATE_HIERARCHY_THRESHOLD,
             metavar='DATE_HIERARCHY_THRESHOLD',
             help='If a model has less than DATE_HIERARCHY_THRESHOLD items '
-            'it will be added to `date_hierarchy` [default: %default]')
+            'it will be added to `date_hierarchy`')
         parser.add_argument(
             '-p', '--prepopulated-fields', action='append',
             default=PREPOPULATED_FIELD_NAMES,
             help='These fields will be prepopulated by the other field.'
-            'The field names can be specified like `spam=eggA,eggB,eggC`'
-            ' [default: %default]')
+            'The field names can be specified like `spam=eggA,eggB,eggC`')
         parser.add_argument(
             '-l', '--list-filter-threshold', type=int,
             default=LIST_FILTER_THRESHOLD, metavar='LIST_FILTER_THRESHOLD',
             help='If a foreign key/field has less than LIST_FILTER_THRESHOLD '
-            'items it will be added to `list_filter` [default: %default]')
+            'items it will be added to `list_filter`')
         parser.add_argument(
             '-r', '--raw-id-threshold', type=int,
             default=RAW_ID_THRESHOLD, metavar='RAW_ID_THRESHOLD',
             help='If a foreign key has more than RAW_ID_THRESHOLD items '
-            'it will be added to `list_filter` [default: %default]')
+            'it will be added to `list_filter`')
         parser.add_argument(
             '-n', '--no-query-db', action="store_true", dest='no_query_db',
             help='Don\'t query the database in order to decide whether '
