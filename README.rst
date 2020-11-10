@@ -4,9 +4,9 @@ Readme
 Introduction
 ------------
 
-.. image:: https://travis-ci.org/WoLpH/django-admin-generator.svg?branch=master
+.. image:: https://travis-ci.com/WoLpH/django-admin-generator.svg?branch=master
     :alt: Test Status
-    :target: https://travis-ci.org/WoLpH/django-admin-generator
+    :target: https://travis-ci.com/WoLpH/django-admin-generator
 
 .. image:: https://coveralls.io/repos/WoLpH/django-admin-generator/badge.svg?branch=master
     :alt: Coverage Status
