@@ -41,7 +41,7 @@ if __name__ == '__main__':
         license='BSD',
         packages=setuptools.find_packages(),
         install_requires=[
-            'django-utils2>=2.5.0',
+            'django-utils2>=2.12.1',
             'six',
         ],
         extras_require={
