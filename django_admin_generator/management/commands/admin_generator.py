@@ -1,26 +1,21 @@
 import re
 import sys
+
 import six
-from django_utils.management.commands import base_command
+from django.apps.registry import apps
 from django.db import models
+from django_utils.management.commands import base_command
 
-try:  # pragma: no cover
-    from django.db.models.loading import get_models
-except ImportError:  # pragma: no cover
-    def get_models(app):
-        for model in app.get_models():
-            yield model
 
-if hasattr(models, 'get_apps'):  # pragma: no cover
-    def get_apps():
-        for app in models.get_apps():
-            yield app.__name__.rsplit('.', 1)[0], app
-else:  # pragma: no cover
-    from django.apps.registry import apps
+def get_models(app):
+    for model in app.get_models():
+        yield model
 
-    def get_apps():
-        for app_config in apps.get_app_configs():
-            yield app_config.name, app_config
+
+def get_apps():
+    for app_config in apps.get_app_configs():
+        yield app_config.name, app_config
+
 
 MAX_LINE_WIDTH = 78
 INDENT_WIDTH = 4
@@ -147,13 +142,15 @@ class AdminModel(object):
         'date_hierarchy',
     )
 
-    def __init__(self, model, raw_id_threshold=RAW_ID_THRESHOLD,
-                 date_hierarchy_threshold=DATE_HIERARCHY_THRESHOLD,
-                 list_filter_threshold=LIST_FILTER_THRESHOLD,
-                 search_field_names=SEARCH_FIELD_NAMES,
-                 date_hierarchy_names=DATE_HIERARCHY_NAMES,
-                 prepopulated_field_names=PREPOPULATED_FIELD_NAMES,
-                 no_query_db=NO_QUERY_DB, **options):
+    def __init__(
+        self, model, raw_id_threshold=RAW_ID_THRESHOLD,
+        date_hierarchy_threshold=DATE_HIERARCHY_THRESHOLD,
+        list_filter_threshold=LIST_FILTER_THRESHOLD,
+        search_field_names=SEARCH_FIELD_NAMES,
+        date_hierarchy_names=DATE_HIERARCHY_NAMES,
+        prepopulated_field_names=PREPOPULATED_FIELD_NAMES,
+        no_query_db=NO_QUERY_DB, **options
+    ):
         self.model = model
         self.list_display = []
         self.list_filter = []
@@ -184,7 +181,7 @@ class AdminModel(object):
         for field in meta.local_many_to_many:
             related_model = self._get_related_model(field)
             related_objects = related_model.objects.all()
-            if(related_objects[:raw_id_threshold].count() < raw_id_threshold):
+            if (related_objects[:raw_id_threshold].count() < raw_id_threshold):
                 yield field.name
 
     def _process_fields(self, meta):
@@ -346,42 +343,51 @@ class Command(base_command.CustomBaseCommand):
         parser.add_argument(
             '-s', '--search-field', action='append',
             default=SEARCH_FIELD_NAMES,
-            help='Fields named like this will be added to `search_fields`')
+            help='Fields named like this will be added to `search_fields`'
+        )
         parser.add_argument(
             '-d', '--date-hierarchy', action='append',
             default=DATE_HIERARCHY_NAMES,
-            help='A field named like this will be set as `date_hierarchy`')
+            help='A field named like this will be set as `date_hierarchy`'
+        )
         parser.add_argument(
             '--date-hierarchy-threshold', type=int,
             default=DATE_HIERARCHY_THRESHOLD,
             metavar='DATE_HIERARCHY_THRESHOLD',
             help='If a model has less than DATE_HIERARCHY_THRESHOLD items '
-            'it will be added to `date_hierarchy`')
+                 'it will be added to `date_hierarchy`'
+        )
         parser.add_argument(
             '-p', '--prepopulated-fields', action='append',
             default=PREPOPULATED_FIELD_NAMES,
             help='These fields will be prepopulated by the other field.'
-            'The field names can be specified like `spam=eggA,eggB,eggC`')
+                 'The field names can be specified like `spam=eggA,eggB,eggC`'
+        )
         parser.add_argument(
             '-l', '--list-filter-threshold', type=int,
             default=LIST_FILTER_THRESHOLD, metavar='LIST_FILTER_THRESHOLD',
             help='If a foreign key/field has less than LIST_FILTER_THRESHOLD '
-            'items it will be added to `list_filter`')
+                 'items it will be added to `list_filter`'
+        )
         parser.add_argument(
             '-r', '--raw-id-threshold', type=int,
             default=RAW_ID_THRESHOLD, metavar='RAW_ID_THRESHOLD',
             help='If a foreign key has more than RAW_ID_THRESHOLD items '
-            'it will be added to `list_filter`')
+                 'it will be added to `list_filter`'
+        )
         parser.add_argument(
             '-n', '--no-query-db', action="store_true", dest='no_query_db',
             help='Don\'t query the database in order to decide whether '
-            'fields/relationships are added to `list_filter`')
+                 'fields/relationships are added to `list_filter`'
+        )
         parser.add_argument(
             'app',
-            help='App to generate admin definitions for')
+            help='App to generate admin definitions for'
+        )
         parser.add_argument(
             'models', nargs='*',
-            help='Regular expressions to filter the models by')
+            help='Regular expressions to filter the models by'
+        )
 
     def warning(self, message):
         # This replaces the regular warning method from the CustomBaseCommand
@@ -397,8 +403,10 @@ class Command(base_command.CustomBaseCommand):
 
         app = installed_apps.get(app)
         if not app:
-            self.warning('This command requires an existing app name as '
-                         'argument')
+            self.warning(
+                'This command requires an existing app name as '
+                'argument'
+            )
             self.warning('Available apps:')
             for app in sorted(installed_apps):
                 self.warning('    %s' % app)
@@ -412,5 +420,3 @@ class Command(base_command.CustomBaseCommand):
 
     def handle_app(self, app, model_res, **options):
         print(AdminApp(app, model_res, **options))
-
-
