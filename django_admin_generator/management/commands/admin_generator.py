@@ -338,7 +338,7 @@ class AdminModel(object):
 class Command(base_command.CustomBaseCommand):
     help = '''Generate a `admin.py` file for the given app (models)'''
     can_import_settings = True
-    requires_system_checks = True
+    requires_system_checks = '__all__',
 
     def add_arguments(self, parser):
         super(Command, self).add_arguments(parser)

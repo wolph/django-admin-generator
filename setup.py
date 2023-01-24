@@ -46,16 +46,15 @@ if __name__ == '__main__':
         ],
         extras_require={
             'docs': [
-                'django>=1.11',
+                'django>=3.2',
                 'mock',
                 'sphinx>=1.6.0',
             ],
             'tests': [
-                'pytest<6',
-                'pytest-cache',
+                'pytest',
                 'pytest-cov',
                 'pytest-django',
-                'pytest-flake8',
+                'flake8',
             ],
         },
         long_description=long_description,
