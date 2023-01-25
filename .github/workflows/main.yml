@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     outputs:
-      toxEnvs: ${{ steps.set-matrix.outputs.toxEnvs }}
+      tox-envs: ${{ steps.set-matrix.outputs.tox-envs }}
     steps:
       - uses: actions/setup-python@v4
         with:
@@ -19,7 +19,7 @@ jobs:
       - run: python -m pip install --upgrade tox
       - id: set-matrix
         run: |
-          echo toxEnvs=$(tox -l | jq -R -s -c 'split("\n") | map(select(length > 0))') >> $GITHUB_OUTPUT
+          echo tox-envs=$(tox -l | jq -R -s -c 'split("\n") | map(select(length > 0))') >> $GITHUB_OUTPUT
 
   build:
     needs: setup
@@ -29,8 +29,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
-        toxEnv: ${{ fromJson(needs.setup.outputs.toxEnvs) }}
+        tox-env: ${{ fromJson(needs.setup.outputs.tox-envs) }}
 
+    if: ${{ contains(matrix.tox-env, matrix.python-version) || !matrix.contains(matrix.tox-env, 'py') }}
     steps:
     - run: cat $GITHUB_OUTPUT
     - uses: actions/checkout@v3
@@ -39,4 +40,4 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - run: python -m pip install --upgrade tox
-    - run: tox --skip-missing-interpreters -e ${{ matrix.toxEnv }}
+    - run: tox --skip-missing-interpreters -e ${{ matrix.tox-env }}
