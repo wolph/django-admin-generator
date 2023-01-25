@@ -30,8 +30,8 @@ jobs:
       matrix:
         tox-env: ${{ fromJson(needs.setup.outputs.tox-envs) }}
 
-    # For some reason this build is broken on github actions
-    if: ${{ matrix.tox-env != 'py37-django32' }}
+#     For some reason this build is broken on github actions
+#    if: ${{ matrix.tox-env != 'py37-django32' }}
     steps:
       - run: |
           PY=${{ matrix.tox-env }}
