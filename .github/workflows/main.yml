@@ -14,28 +14,33 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/tox
+        with:
+          tags: 'py3'
+          environment: 'dev'
+          print_tags: true
+          logLevel: 'info'
       - id: set-matrix
         run: |
           echo tox-envs=$(tox -l | grep py | jq -R -s -c 'split("\n") | map(select(length > 0))') >> $GITHUB_OUTPUT
 
-  build:
-    needs: setup
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        tox-env: ${{ fromJson(needs.setup.outputs.tox-envs) }}
-
-#    if: ${{ !contains(matrix.tox-env, 'py311') }}
-    steps:
-      - run: |
-          PY=${{ matrix.tox-env }}
-          PY=${PY//-django*/}
-          PY=${PY//py3/3.}
-          echo "PY=$PY" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/tox
-        with:
-          python-version: ${{ env.PY }}
-      - run: tox --skip-missing-interpreters -e ${{ matrix.tox-env }}
+#  build:
+#    needs: setup
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 10
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        tox-env: ${{ fromJson(needs.setup.outputs.tox-envs) }}
+#
+##    if: ${{ !contains(matrix.tox-env, 'py311') }}
+#    steps:
+#      - run: |
+#          PY=${{ matrix.tox-env }}
+#          PY=${PY//-django*/}
+#          PY=${PY//py3/3.}
+#          echo "PY=$PY" >> $GITHUB_ENV
+#      - uses: actions/checkout@v3
+#      - uses: ./.github/actions/tox
+#        with:
+#          python-version: ${{ env.PY }}
+#      - run: tox --skip-missing-interpreters -e ${{ matrix.tox-env }}
