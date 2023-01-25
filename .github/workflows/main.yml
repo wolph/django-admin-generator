@@ -24,6 +24,7 @@ jobs:
 #          echo toxEnvs=$(tox -l | jq -R -s -c 'split("\n") | map(select(length > 0))')
 
   build:
+    needs: setup
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
