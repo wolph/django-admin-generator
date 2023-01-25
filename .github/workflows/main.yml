@@ -13,7 +13,7 @@ jobs:
       - run: python -m pip install --upgrade tox
       - run: |
           echo "::set-output name=tox_envs::$(tox --listenvs)"
-      - run: envs
+      - run: env
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -29,5 +29,5 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - run: python -m pip install --upgrade tox
-    - run: envs
+    - run: env
     - run: tox -e ${{ matrix.tox-env }}
