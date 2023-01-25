@@ -14,8 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/tox
-        with:
-          python-version: '3.10'
       - id: set-matrix
         run: |
           echo tox-envs=$(tox -l | grep py | jq -R -s -c 'split("\n") | map(select(length > 0))') >> $GITHUB_OUTPUT
