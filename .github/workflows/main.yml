@@ -12,11 +12,10 @@ jobs:
     outputs:
       tox-envs: ${{ steps.set-matrix.outputs.tox-envs }}
     steps:
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/tox.yml
         with:
           python-version: '3.10'
-      - uses: actions/checkout@v3
-      - run: python -m pip install --upgrade tox
       - id: set-matrix
         run: |
           echo tox-envs=$(tox -l | grep py | jq -R -s -c 'split("\n") | map(select(length > 0))') >> $GITHUB_OUTPUT
@@ -35,12 +34,9 @@ jobs:
     - run: |
         PY=${{ matrix.tox-env }}
         PY=${PY//-django*/}
-        PY=${PY//py3/py3.}
+        PY=${PY//py3/3.}
         echo "PY=$PY" >> $GITHUB_ENV
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ env.PY }}
-      uses: actions/setup-python@v4
+    - uses: ./.github/actions/tox.yml
       with:
         python-version: ${{ env.PY }}
-    - run: python -m pip install --upgrade tox
     - run: tox --skip-missing-interpreters -e ${{ matrix.tox-env }}
