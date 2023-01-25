@@ -12,8 +12,8 @@ jobs:
     steps:
       - run: python -m pip install --upgrade tox
       - run: |
-        TOX_ENVS='${{ toJSON(tox --listenvs) }}'
-        echo ::set-output name=tox_envs::${TOX_ENVS}
+          TOX_ENVS='${{ toJSON(tox --listenvs) }}'
+          echo ::set-output name=tox_envs::${TOX_ENVS}
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
