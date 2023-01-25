@@ -4,9 +4,13 @@ Readme
 Introduction
 ------------
 
-.. image:: https://travis-ci.com/WoLpH/django-admin-generator.svg?branch=master
-    :alt: Test Status
-    :target: https://travis-ci.com/WoLpH/django-admin-generator
+Build status:
+
+.. image:: https://github.com/WoLpH/django-admin-generator/actions/workflows/main.yml/badge.svg
+    :alt: django-admin-generator test status
+    :target: https://github.com/WoLpH/django-admin-generator/actions
+
+Coverage:
 
 .. image:: https://coveralls.io/repos/WoLpH/django-admin-generator/badge.svg?branch=master
     :alt: Coverage Status
