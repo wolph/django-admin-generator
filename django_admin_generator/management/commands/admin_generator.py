@@ -51,7 +51,6 @@ NO_QUERY_DB = False
 PRINT_IMPORTS = '''# vim: set fileencoding=utf-8 :
 from django.contrib import admin
 
-from . import models
 '''
 
 PRINT_ADMIN_CLASS = '''
