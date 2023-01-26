@@ -117,12 +117,12 @@ class AdminApp(object):
             model = admin_model.model
             module = model.__module__
             # Get the module name if it was generated before or use the last
-            # part of the module path.
+            # part of the module path
             name = modules.get(module, module.rsplit('.', 1)[-1])
             print(name, module, file=sys.stderr)
 
             # If the module name was already used, use the last two parts of
-            # the module path converting `project.spam.models` to `spam_models`.
+            # the module path converting `project.spam.models` to `spam_models`
             if module_names.get(name, module) != module:
                 name = '_'.join(module.rsplit('.', 2)[-2:])
 
