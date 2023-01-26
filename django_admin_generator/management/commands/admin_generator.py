@@ -15,6 +15,7 @@ def get_models(app):
 def get_apps():
     for app_config in apps.get_app_configs():
         yield app_config.name, app_config
+        yield app_config.name.rsplit('.')[-1], app_config
 
 
 MAX_LINE_WIDTH = 78
@@ -50,7 +51,6 @@ NO_QUERY_DB = False
 PRINT_IMPORTS = '''# vim: set fileencoding=utf-8 :
 from django.contrib import admin
 
-from . import models
 '''
 
 PRINT_ADMIN_CLASS = '''
@@ -67,11 +67,11 @@ def _register(model, admin_class):
 '''
 
 PRINT_ADMIN_REGISTRATION = '''
-_register(models.%(name)s, %(name)sAdmin)'''
+_register(%(full_name)s, %(name)sAdmin)'''
 
 PRINT_ADMIN_REGISTRATION_LONG = '''
 _register(
-    models.%(name)s,
+    %(full_name)s,
     %(name)sAdmin)'''
 
 PRINT_ADMIN_PROPERTY = '''
@@ -109,6 +109,30 @@ class AdminApp(object):
     def _unicode_generator(self):
         yield PRINT_IMPORTS
 
+        models = dict()
+        modules = dict()
+        module_names = dict()
+        for admin_model in sorted(self, key=lambda x: x.model.__module__):
+            model = admin_model.model
+            module = model.__module__
+            # Get the module name if it was generated before or use the last
+            # part of the module path
+            name = modules.get(module, module.rsplit('.', 1)[-1])
+            print(name, module, file=sys.stderr)
+
+            # If the module name was already used, use the last two parts of
+            # the module path converting `project.spam.models` to `spam_models`
+            if module_names.get(name, module) != module:
+                name = '_'.join(module.rsplit('.', 2)[-2:])
+
+            # Store the module name and models for later use.
+            module_names[name] = module
+            modules[module] = name
+            models[admin_model.name] = name
+
+        for module, name in sorted(modules.items()):
+            yield 'import %s as %s\n' % (module, name)
+
         admin_model_names = []
         for admin_model in self:
             yield PRINT_ADMIN_CLASS % dict(
@@ -120,9 +144,11 @@ class AdminApp(object):
         yield PRINT_ADMIN_REGISTRATION_METHOD
 
         for name in admin_model_names:
-            row = PRINT_ADMIN_REGISTRATION % dict(name=name)
+            full_name = '%s.%s' % (models[name], name)
+            context = dict(name=name, full_name=full_name)
+            row = PRINT_ADMIN_REGISTRATION % context
             if len(row) > MAX_LINE_WIDTH:
-                row = PRINT_ADMIN_REGISTRATION_LONG % dict(name=name)
+                row = PRINT_ADMIN_REGISTRATION_LONG % context
             yield row
 
     def __repr__(self):
