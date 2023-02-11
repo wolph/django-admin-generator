@@ -1,6 +1,7 @@
 import re
 import sys
 
+import python_utils
 import six
 from django.apps.registry import apps
 from django.db import models
@@ -178,10 +179,10 @@ class AdminModel(object):
         no_query_db=NO_QUERY_DB, **options
     ):
         self.model = model
-        self.list_display = []
-        self.list_filter = []
-        self.raw_id_fields = []
-        self.search_fields = []
+        self.list_display = python_utils.UniqueList()
+        self.list_filter = python_utils.UniqueList()
+        self.raw_id_fields = python_utils.UniqueList()
+        self.search_fields = python_utils.UniqueList()
         self.prepopulated_fields = {}
         self.date_hierarchy = None
         self.search_field_names = search_field_names

@@ -1,7 +1,6 @@
 import os
-import sys
+
 import setuptools
-from setuptools.command.test import test as TestCommand
 
 # To prevent importing about and thereby breaking the coverage info we use this
 # exec hack
@@ -9,26 +8,11 @@ about = {}
 with open('django_admin_generator/__about__.py') as fp:
     exec(fp.read(), about)
 
-
 if os.path.isfile('README.rst'):
     long_description = open('README.rst').read()
 else:
     long_description = ('See http://pypi.python.org/pypi/' +
                         about['__package_name__'])
-
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
-
 
 if __name__ == '__main__':
     setuptools.setup(
@@ -42,6 +26,7 @@ if __name__ == '__main__':
         packages=setuptools.find_packages(),
         install_requires=[
             'django-utils2>=2.12.1',
+            'python-utils>=3.5.2',
             'six',
         ],
         extras_require={
@@ -58,7 +43,6 @@ if __name__ == '__main__':
             ],
         },
         long_description=long_description,
-        cmdclass={'test': PyTest},
         classifiers=[
             'Development Status :: 5 - Production/Stable',
             'Environment :: Web Environment',
@@ -72,4 +56,3 @@ if __name__ == '__main__':
             'Programming Language :: Python :: 3.11',
         ],
     )
-
