@@ -49,7 +49,7 @@ LIST_FILTER_THRESHOLD = 25
 RAW_ID_THRESHOLD = 100
 NO_QUERY_DB = False
 
-PRINT_IMPORTS = '''# vim: set fileencoding=utf-8 :
+PRINT_IMPORTS = '''
 from django.contrib import admin
 
 '''
