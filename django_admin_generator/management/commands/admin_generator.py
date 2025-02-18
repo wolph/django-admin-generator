@@ -1,11 +1,17 @@
+import pathlib
 import re
 import sys
+from pathlib import Path
+from typing import Any, List
 
 import python_utils
 import six
+from django.apps import AppConfig
 from django.apps.registry import apps
+from django.conf import settings
 from django.db import models
 from django_utils.management.commands import base_command
+from python_utils import logger, types
 
 
 def get_models(app):
@@ -13,10 +19,28 @@ def get_models(app):
         yield model
 
 
-def get_apps():
+def get_apps() -> types.Generator[types.Tuple[str, AppConfig], None, None]:
     for app_config in apps.get_app_configs():
         yield app_config.name, app_config
         yield app_config.name.rsplit('.')[-1], app_config
+
+
+def get_local_apps() -> List[AppConfig]:
+    local_app_configs: List[AppConfig] = []
+    # Get the absolute path of the project's base directory as a Path object
+    project_root: Path = Path(settings.BASE_DIR).resolve()
+
+    # If your virtual environment is inside the project directory, get its path
+    venv_path: Path = project_root / 'venv'  # Adjust 'venv' if your virtualenv folder has a different name
+
+    for app_config in apps.get_app_configs():
+        app_path: Path = Path(app_config.path).resolve()
+        # Check if the app is within the project directory but not in the virtual environment or site-packages
+        if (project_root in app_path.parents or app_path == project_root) \
+                and (venv_path not in app_path.parents) \
+                and ('site-packages' not in str(app_path)):
+            local_app_configs.append(app_config)
+    return local_app_configs
 
 
 MAX_LINE_WIDTH = 78
@@ -49,14 +73,22 @@ LIST_FILTER_THRESHOLD = 25
 RAW_ID_THRESHOLD = 100
 NO_QUERY_DB = False
 
-PRINT_IMPORTS = '''
+PRINT_IMPORTS_BASE = '''
 from django.contrib import admin
+{imports}
 
+class ModelAdminBase({model_admin_class}):
+    formfield_overrides = {formfield_overrides}
+'''
+
+VERSION_ADMIN_CLASS = '''
+class VersionModelAdminBase({reversion_admin_class}, ModelAdminBase):
+    pass
 '''
 
 PRINT_ADMIN_CLASS = '''
 
-class %(name)sAdmin(admin.ModelAdmin):
+class %(name)sAdmin(%(base_class)s):
 %(class_)s
 '''
 
@@ -79,11 +111,12 @@ PRINT_ADMIN_PROPERTY = '''
     %(key)s = %(value)s'''
 
 
-class AdminApp(object):
+class AdminApp:
     def __init__(self, app, model_res, **options):
         self.app = app
         self.model_res = model_res
         self.options = options
+        self._reversion_enabled = False
 
     def __iter__(self):
         for model in get_models(self.app):
@@ -107,8 +140,18 @@ class AdminApp(object):
         else:
             return self.__unicode__()
 
+    def _get_imports(self):
+        imports = []
+        formfield_overrides = dict()
+        self._detect_json_widget_support(formfield_overrides, imports)
+        return imports, formfield_overrides
+
     def _unicode_generator(self):
-        yield PRINT_IMPORTS
+        imports = []
+        formfield_overrides = dict()
+
+        self._detect_json_widget_support(formfield_overrides, imports)
+        yield from self._yield_imports_and_base_classes(imports, formfield_overrides)
 
         models = dict()
         modules = dict()
@@ -119,7 +162,6 @@ class AdminApp(object):
             # Get the module name if it was generated before or use the last
             # part of the module path
             name = modules.get(module, module.rsplit('.', 1)[-1])
-            print(name, module, file=sys.stderr)
 
             # If the module name was already used, use the last two parts of
             # the module path converting `project.spam.models` to `spam_models`
@@ -136,9 +178,15 @@ class AdminApp(object):
 
         admin_model_names = []
         for admin_model in self:
+            if self._reversion_enabled and re.match(self.options.get('reversion_admin_regex'), admin_model.name):
+                base_class = 'VersionModelAdminBase'
+            else:
+                base_class = 'ModelAdminBase'
+
             yield PRINT_ADMIN_CLASS % dict(
                 name=admin_model.name,
                 class_=admin_model,
+                base_class=base_class,
             )
             admin_model_names.append(admin_model.name)
 
@@ -152,6 +200,45 @@ class AdminApp(object):
                 row = PRINT_ADMIN_REGISTRATION_LONG % context
             yield row
 
+    def _detect_json_widget_support(self, formfield_overrides, imports):
+        if not self.options.get('disable_json_widget'):
+            try:
+                import django_json_widget
+            except ImportError:
+                pass
+            else:
+                imports.append(
+                    'from django_json_widget.widgets import JSONEditorWidget')
+                imports.append('from django.db.models import JSONField')
+                formfield_overrides['JSONField'] = {
+                    'widget': 'JSONEditorWidget',
+                }
+
+    def _yield_imports_and_base_classes(self, imports, formfield_overrides):
+        addendum = ''
+        if self.options.get('enable_reversion'):
+            try:
+                import reversion
+            except ImportError:
+                pass
+            else:
+                self._reversion_enabled = True
+                imports.append(self.options.get('reversion_admin_class_import'))
+
+                assert 'VersionModelAdminBase' != self.options.get('reversion_admin_class'), \
+                    'The reversion admin base class cannot be the same as the default admin base class'
+                addendum = VERSION_ADMIN_CLASS.format(
+                    reversion_admin_class=self.options.get('reversion_admin_class'),
+                ) + '\n\n'
+
+        yield PRINT_IMPORTS_BASE.format(
+            formfield_overrides=formfield_overrides,
+            imports='\n'.join(imports),
+            model_admin_class=self.options.get('admin_class'),
+        )
+
+        yield addendum
+
     def __repr__(self):
         return '<%s[%s]>' % (
             self.__class__.__name__,
@@ -164,6 +251,7 @@ class AdminModel(object):
         'list_display',
         'list_filter',
         'raw_id_fields',
+        'auto_complete_fields',
         'search_fields',
         'prepopulated_fields',
         'date_hierarchy',
@@ -176,13 +264,17 @@ class AdminModel(object):
         search_field_names=SEARCH_FIELD_NAMES,
         date_hierarchy_names=DATE_HIERARCHY_NAMES,
         prepopulated_field_names=PREPOPULATED_FIELD_NAMES,
-        no_query_db=NO_QUERY_DB, **options
+        no_query_db=NO_QUERY_DB,
+        auto_complete: list[str] | None=None,
+        disable_auto_complete: bool=False,
+        **options
     ):
         self.model = model
         self.list_display = python_utils.UniqueList()
         self.list_filter = python_utils.UniqueList()
         self.raw_id_fields = python_utils.UniqueList()
         self.search_fields = python_utils.UniqueList()
+        self.auto_complete_fields = python_utils.UniqueList()
         self.prepopulated_fields = {}
         self.date_hierarchy = None
         self.search_field_names = search_field_names
@@ -192,6 +284,7 @@ class AdminModel(object):
         self.date_hierarchy_names = date_hierarchy_names
         self.prepopulated_field_names = prepopulated_field_names
         self.query_db = not no_query_db
+        self.auto_complete = auto_complete or not disable_auto_complete
 
     def __repr__(self):
         return '<%s[%s]>' % (
@@ -206,9 +299,17 @@ class AdminModel(object):
     def _process_many_to_many(self, meta):
         raw_id_threshold = self.raw_id_threshold
         for field in meta.local_many_to_many:
+            if field.name in self.auto_complete_fields:
+                continue
+
             related_model = self._get_related_model(field)
             related_objects = related_model.objects.all()
             if (related_objects[:raw_id_threshold].count() < raw_id_threshold):
+                yield field.name
+
+    def _process_many_to_many_autocomplete(self, meta):
+        for field in meta.local_many_to_many:
+            if self.auto_complete is True or field.name in self.auto_complete:
                 yield field.name
 
     def _process_fields(self, meta):
@@ -324,6 +425,8 @@ class AdminModel(object):
         meta = self.model._meta
         qs = self.model.objects.all()
 
+        if self.auto_complete:
+            self.auto_complete_fields += list(self._process_many_to_many_autocomplete(meta))
         if self.query_db:
             self.raw_id_fields += list(self._process_many_to_many(meta))
 
@@ -408,42 +511,142 @@ class Command(base_command.CustomBaseCommand):
                  'fields/relationships are added to `list_filter`'
         )
         parser.add_argument(
+            '-w', '--write', action='store_true',
+            help='Write the output to the admin.py file(s)',
+        )
+        parser.add_argument(
+            '-o', '--output', default='admin.py',
+            help='Output file name',
+        )
+        parser.add_argument(
+            '-f', '--force', action='store_true',
+            help='Overwrite the output file if it exists',
+        )
+        parser.add_argument(
+            '-a', '--append', action='store_true',
+            help='Append the output to the output file if it exists',
+        )
+        parser.add_argument(
             'app',
-            help='App to generate admin definitions for'
+            help='App to generate admin definitions for, use `all` to generate '
+                 'for all local (i.e. not in site-packages) apps'
         )
         parser.add_argument(
             'models', nargs='*',
             help='Regular expressions to filter the models by'
         )
+        parser.add_argument(
+            '--disable-json-widget', action='store_true',
+            help='Disable the JSON widget import and formfield override',
+        )
+        parser.add_argument(
+            '--enable-reversion', action='store_true',
+            help='Enable django-reversion support',
+        )
+        parser.add_argument(
+            '--reversion-admin-regex', default=r'.*',
+            help='Regular expression to filter the models by for reversion',
+        )
+        parser.add_argument(
+            '--reversion-admin-class', default='VersionAdmin',
+            help='The base class for the ModelAdmin classes for reversion',
+        )
+        parser.add_argument(
+            '--reversion-admin-class-import', default='from reversion.admin import VersionAdmin',
+            help='The import statement for the base class for the ModelAdmin classes for reversion',
+        )
+        parser.add_argument(
+            '--admin-class', default='admin.ModelAdmin',
+            help='The base class for the ModelAdmin classes',
+        )
+        parser.add_argument(
+            '--admin-class-import', default='',
+            help='The import statement for the base class for the ModelAdmin classes if it is not the Django default',
+        )
+        parser.add_argument(
+            '--disable-auto-complete', action='store_true',
+            help='Disable the auto-complete feature for the many-to-many fields',
+        )
+        parser.add_argument(
+            '--auto-complete', action='append',
+            help='Enable the auto-complete feature only for the specified many-to-many fields',
+        )
 
-    def warning(self, message):
+    @classmethod
+    def warning(
+            cls,
+            msg: object,
+            *args: object,
+            exc_info: logger._ExcInfoType = None,
+            stack_info: bool = False,
+            stacklevel: int = 1,
+            extra: types.Union[types.Mapping[str, object], None] = None,
+    ) -> None:
         # This replaces the regular warning method from the CustomBaseCommand
         # since some Django installations capture all logging output
         # unfortunately
-        sys.stderr.write(message)
+        sys.stderr.write(str(msg))
         sys.stderr.write('\n')
 
-    def handle(self, app=None, *args, **kwargs):
+    def handle(self, app: types.Optional[str]=None, *args, **kwargs):
         super(Command, self).handle(*args, **kwargs)
 
-        installed_apps = dict(get_apps())
+        if app == 'all':
+            for app in get_local_apps():
+                self.handle_app(app, [], **kwargs)
+        else:
+            installed_apps: dict[str, Any] = dict(get_apps())
 
-        app = installed_apps.get(app)
-        if not app:
-            self.warning(
-                'This command requires an existing app name as '
-                'argument'
-            )
-            self.warning('Available apps:')
-            for app in sorted(installed_apps):
-                self.warning('    %s' % app)
-            sys.exit(1)
+            app = installed_apps.get(app)
+            if not app:
+                self.warning(
+                    'This command requires an existing app name as '
+                    'argument'
+                )
+                self.warning('Available apps:')
+                for app in sorted(installed_apps):
+                    self.warning('    %s' % app)
+                sys.exit(1)
 
-        model_res = []
-        for model in kwargs.get('models', []):
-            model_res.append(re.compile(model, re.IGNORECASE))
+            model_res = []
+            for model in kwargs.get('models', []):
+                model_res.append(re.compile(model, re.IGNORECASE))
 
-        self.handle_app(app, model_res, **kwargs)
+            self.handle_app(app, model_res, **kwargs)
 
-    def handle_app(self, app, model_res, **options):
-        print(AdminApp(app, model_res, **options))
+    def handle_app(
+            self,
+            app,
+            model_res,
+            write: bool=False,
+            output: types.Optional[str]=None,
+            force: bool=False,
+            append: bool=False,
+            **options,
+    ):
+        if output:
+            if '/' in output or '\\' in output:
+                output_path = pathlib.Path(output)
+            else:
+                output_path = pathlib.Path(app.path) / output
+
+            print(f'Writing {app.name} to {output_path}', file=sys.stderr)
+
+            if output_path.exists():
+                if not force and not append:
+                    self.warning(
+                        'The output file `%s` already exists. Use the '
+                        '`-f` or `-a` option to overwrite or append to it.'
+                        % output
+                    )
+                    sys.exit(1)
+
+            fh = output_path.open('a' if append else 'w') if write else sys.stdout
+            print(f'Writing to {fh}', file=sys.stderr)
+        else:
+            fh = sys.stdout
+
+        print(AdminApp(app, model_res, **options), file=fh)
+
+        if output:
+            fh.close()
