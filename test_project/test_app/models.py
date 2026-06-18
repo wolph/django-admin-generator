@@ -1,6 +1,10 @@
 from django.db import models
 
-from .sub_models import eggs, meat, models as sub_models_models
+from .sub_models import (
+    eggs,
+    meat,
+    models as sub_models_models,
+)
 
 assert eggs
 assert meat

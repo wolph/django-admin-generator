@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+  workflow_dispatch:
+  # Allows publish.yml to run the full test suite as a release gate.
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        django-version: [django42, django50, django51, django52, django60]
+        exclude:
+          # Django 4.2 / 5.0 do not support Python 3.13.
+          - python-version: '3.13'
+            django-version: django42
+          - python-version: '3.13'
+            django-version: django50
+          # Django 6.0 requires Python 3.12+.
+          - python-version: '3.10'
+            django-version: django60
+          - python-version: '3.11'
+            django-version: django60
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          activate-environment: true
+          python-version: ${{ matrix.python-version }}
+      - name: Install tox
+        run: uv pip install '.[tox]'
+      - name: Run tests
+        run: tox -e py$(echo "${{ matrix.python-version }}" | tr -d .)-${{ matrix.django-version }}
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.python-version }}-${{ matrix.django-version }}
+          path: .tox/.coverage.*
+          include-hidden-files: true
+
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [test, docs]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          activate-environment: true
+      - name: Install tox
+        run: uv pip install '.[tox]'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-*
+          path: .tox
+          merge-multiple: true
+      - name: Combine coverage and check threshold
+        run: tox -e coverage
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          activate-environment: true
+      - name: Install tox
+        run: uv pip install '.[tox]'
+      - name: Lint
+        run: tox -e lint
+
+  type-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          activate-environment: true
+      - name: Install tox
+        run: uv pip install '.[tox]'
+      - name: Type-check (mypy, pyright, pyrefly)
+        run: tox -e mypy,pyright,pyrefly
+
+  docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+        with:
+          activate-environment: true
+      - name: Install tox
+        run: uv pip install '.[tox]'
+      - name: Build docs
+        run: tox -e docs
