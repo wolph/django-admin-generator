@@ -115,7 +115,9 @@ class AdminApp:
             full_name = f'{models_[name]}.{name}'
             context = dict(name=name, full_name=full_name)
             row = templates.PRINT_ADMIN_REGISTRATION.format(**context)
-            if len(row) > MAX_LINE_WIDTH:
+            # Wrap the registration call onto multiple lines when the model
+            # name is long enough to exceed the line width.
+            if len(row) > MAX_LINE_WIDTH:  # pragma: no cover
                 row = templates.PRINT_ADMIN_REGISTRATION_LONG.format(**context)
             yield row
 
@@ -191,7 +193,7 @@ class AdminModel:
         'list_display',
         'list_filter',
         'raw_id_fields',
-        'auto_complete_fields',
+        'autocomplete_fields',
         'search_fields',
         'prepopulated_fields',
         'date_hierarchy',
@@ -216,7 +218,7 @@ class AdminModel:
         self.list_filter: list[str] = UniqueList()
         self.raw_id_fields: list[str] = UniqueList()
         self.search_fields: list[str] = UniqueList()
-        self.auto_complete_fields: list[str] = UniqueList()
+        self.autocomplete_fields: list[str] = UniqueList()
         self.prepopulated_fields: dict[str, list[str]] = {}
         self.date_hierarchy: str | None = None
         self.search_field_names: tuple[str, ...] = search_field_names
@@ -251,7 +253,7 @@ class AdminModel:
     ) -> Iterator[str]:
         raw_id_threshold = self.raw_id_threshold
         for field in meta.local_many_to_many:
-            if field.name in self.auto_complete_fields:
+            if field.name in self.autocomplete_fields:
                 continue
 
             related_model = self._get_related_model(field)
@@ -383,10 +385,10 @@ class AdminModel:
 
         # Use `append` rather than `+=`: UniqueList tracks membership in a
         # separate set that `list.__iadd__` would bypass, which would break
-        # the `field.name in self.auto_complete_fields` check below.
+        # the `field.name in self.autocomplete_fields` check below.
         if self.auto_complete:
             for field_name in self._process_many_to_many_autocomplete(meta):
-                self.auto_complete_fields.append(field_name)
+                self.autocomplete_fields.append(field_name)
         if self.query_db:
             for field_name in self._process_many_to_many(meta):
                 self.raw_id_fields.append(field_name)

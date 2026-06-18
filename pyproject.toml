@@ -68,6 +68,9 @@ tox = [
     'tox-uv>=1.0',
     'tox-gh-actions>=3.0',
 ]
+demo = [
+    'django>=4.2',
+]
 
 [tool.uv.build-backend]
 module-root = ''

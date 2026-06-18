@@ -1,0 +1,68 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<div class="module dag-demo" style="margin-bottom:24px;padding:16px 20px;border-left:4px solid #79aec8;background:#f8fbfd;">
+  <h2 style="margin-top:0;">👋 Django Admin Generator — live demo</h2>
+  <p style="max-width:60em;">
+    Everything under <strong>BLOG</strong> below was scaffolded automatically by
+    <code>django-admin-generator</code>. It introspects your models and writes a
+    ready-to-use <code>admin.py</code> — <code>list_display</code>,
+    <code>list_filter</code>, <code>search_fields</code>,
+    <code>raw_id_fields</code>, <code>date_hierarchy</code>,
+    <code>prepopulated_fields</code> and autocomplete — so you don't have to.
+  </p>
+
+  <h3 style="margin-bottom:4px;">Try it yourself (3 steps)</h3>
+  <ol style="max-width:60em;">
+    <li>Add <code>django_admin_generator</code> to <code>INSTALLED_APPS</code>.</li>
+    <li>Run <code>python manage.py admin_generator blog -p slug=title --write</code>
+        (<code>-p slug=title</code> prepopulates Post slugs from the title).</li>
+    <li>Reload this page — your admin is done. (Re-run with
+        <code>--force</code> to overwrite.)</li>
+  </ol>
+
+  <h3 style="margin-bottom:4px;">What was generated, and why</h3>
+  <table style="width:100%;max-width:70em;border-collapse:collapse;">
+    <thead>
+      <tr style="text-align:left;border-bottom:1px solid #dfdfdf;">
+        <th style="padding:6px 8px;">See it here</th>
+        <th style="padding:6px 8px;">Generated option</th>
+        <th style="padding:6px 8px;">Heuristic</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:6px 8px;"><a href="{% url 'admin:blog_post_changelist' %}">Posts</a></td>
+        <td style="padding:6px 8px;"><code>date_hierarchy</code> + <code>list_filter</code></td>
+        <td style="padding:6px 8px;">DateField named <code>created_at</code> → drill-down bar; Date/Boolean/FK fields → filters.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:6px 8px;"><a href="{% url 'admin:blog_post_add' %}">Add a Post</a></td>
+        <td style="padding:6px 8px;"><code>prepopulated_fields</code> + autocomplete</td>
+        <td style="padding:6px 8px;">Type a title → <code>slug</code> auto-fills; <code>tags</code> (M2M) uses an autocomplete widget.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:6px 8px;"><a href="{% url 'admin:blog_comment_changelist' %}">Comments</a></td>
+        <td style="padding:6px 8px;"><code>raw_id_fields</code></td>
+        <td style="padding:6px 8px;"><code>post</code> is an FK to a table with &gt;100 rows → a lookup popup, not a giant dropdown.</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:6px 8px;"><a href="{% url 'admin:blog_tag_changelist' %}">Tags</a></td>
+        <td style="padding:6px 8px;">no <code>list_filter</code></td>
+        <td style="padding:6px 8px;">120 tags exceed the filter threshold (25), so no useless high-cardinality filter is added.</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 8px;"><a href="{% url 'admin:blog_author_changelist' %}">Authors</a></td>
+        <td style="padding:6px 8px;"><code>search_fields</code>; TextField skipped</td>
+        <td style="padding:6px 8px;"><code>name</code>/<code>slug</code> → search; <code>bio</code> (TextField) is shown but never filtered.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-bottom:0;color:#666;">
+    The annotated source is in <code>blog/admin.py</code>. See
+    <a href="https://github.com/WoLpH/django-admin-generator/">the docs</a> for
+    all options (thresholds, reversion, JSON widget, …).
+  </p>
+</div>
+{{ block.super }}
+{% endblock %}

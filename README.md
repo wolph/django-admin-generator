@@ -61,6 +61,19 @@ Use `all` as the app name to generate admins for every local (i.e. not in
 ./manage.py admin_generator all
 ```
 
+## Live demo
+
+A self-documenting blog demo whose `admin.py` is fully auto-generated:
+
+```sh
+uv run --extra demo python test_project/manage.py demo   # or: tox -e demo
+```
+
+Then open <http://127.0.0.1:8000/admin/> and log in with `admin` / `admin`. The
+admin index explains what was generated and why. See
+[`test_project/README.md`](https://github.com/WoLpH/django-admin-generator/blob/develop/test_project/README.md)
+for a guided tour.
+
 ## Development
 
 This project uses [uv](https://docs.astral.sh/uv/) and

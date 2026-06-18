@@ -8,7 +8,7 @@ exclude = [
     '.tox',
     'build',
     'docs',
-    'test_project/test_app/migrations',
+    '**/migrations',
     # Ignore local test files/directories/old-stuff
     'test.py',
     '*_old.py',
