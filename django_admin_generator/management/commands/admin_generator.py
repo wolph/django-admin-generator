@@ -36,15 +36,17 @@ class Command(base_command.CustomBaseCommand):  # type: ignore[misc]
         parser.add_argument(
             '-s',
             '--search-field',
+            dest='search_field_names',
             action='append',
-            default=SEARCH_FIELD_NAMES,
+            default=list(SEARCH_FIELD_NAMES),
             help='Fields named like this will be added to `search_fields`',
         )
         parser.add_argument(
             '-d',
             '--date-hierarchy',
+            dest='date_hierarchy_names',
             action='append',
-            default=DATE_HIERARCHY_NAMES,
+            default=list(DATE_HIERARCHY_NAMES),
             help='A field named like this will be set as `date_hierarchy`',
         )
         parser.add_argument(
@@ -58,8 +60,9 @@ class Command(base_command.CustomBaseCommand):  # type: ignore[misc]
         parser.add_argument(
             '-p',
             '--prepopulated-fields',
+            dest='prepopulated_field_names',
             action='append',
-            default=PREPOPULATED_FIELD_NAMES,
+            default=list(PREPOPULATED_FIELD_NAMES),
             help='These fields will be prepopulated by the other field.'
             'The field names can be specified like `spam=eggA,eggB,eggC`',
         )

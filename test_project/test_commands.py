@@ -34,6 +34,23 @@ def test_parser(command):
     command.create_parser('manage.py', 'admin_generator')
 
 
+def test_parser_append_options(command):
+    # The append options must use the generator's option names as their dest
+    # and append to (a copy of) the list defaults without crashing.
+    parser = command.create_parser('manage.py', 'admin_generator')
+    ns = parser.parse_args(
+        ['myapp', '-s', 'title', '-d', 'published_at', '-p', 'slug=title'],
+    )
+    assert ns.search_field_names == ['name', 'slug', 'title']
+    assert ns.date_hierarchy_names == [
+        'joined_at',
+        'updated_at',
+        'created_at',
+        'published_at',
+    ]
+    assert ns.prepopulated_field_names == ['slug=name', 'slug=title']
+
+
 def check_output(capsys):
     out, _err = capsys.readouterr()
     # Strip out encodings (and all other comments) so `compile` doesn't break
