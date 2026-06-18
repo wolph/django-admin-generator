@@ -18,3 +18,5 @@ class DateHierarchyModel(models.Model):
 class SluggedField(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100)
+    # A TextField is excluded from the `list_filter` distinct() queries.
+    notes = models.TextField()

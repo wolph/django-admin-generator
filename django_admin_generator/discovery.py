@@ -33,8 +33,9 @@ def get_local_apps() -> list[AppConfig]:
     # Absolute path of the project's base directory.
     project_root: Path = Path(settings.BASE_DIR).resolve()
 
-    # If the virtual environment lives inside the project directory, skip it.
-    venv_path: Path = project_root / 'venv'
+    # If a virtual environment lives inside the project directory, skip it.
+    # Both `venv` and the uv default `.venv` are checked.
+    venv_paths: list[Path] = [project_root / 'venv', project_root / '.venv']
 
     for app_config in apps.get_app_configs():
         app_path: Path = Path(app_config.path).resolve()
@@ -42,7 +43,7 @@ def get_local_apps() -> list[AppConfig]:
         # site-packages.
         if (
             (project_root in app_path.parents or app_path == project_root)
-            and venv_path not in app_path.parents
+            and not any(vp in app_path.parents for vp in venv_paths)
             and 'site-packages' not in str(app_path)
         ):
             local_app_configs.append(app_config)

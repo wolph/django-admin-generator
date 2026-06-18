@@ -228,9 +228,15 @@ class AdminModel:
             prepopulated_field_names
         )
         self.query_db: bool = not no_query_db
-        self.auto_complete: list[str] | bool = (
-            auto_complete or not disable_auto_complete
-        )
+        # An explicit (possibly empty) `auto_complete` list takes precedence;
+        # only fall back to the on/off default when it was not provided.
+        self.auto_complete: list[str] | bool
+        if disable_auto_complete:
+            self.auto_complete = False
+        elif auto_complete is not None:
+            self.auto_complete = auto_complete
+        else:
+            self.auto_complete = True
         self.processed: bool = False
 
     def __repr__(self) -> str:
@@ -395,11 +401,25 @@ class AdminModel:
 
         self.processed = True
 
+    #: Field types that do not support ``DISTINCT`` on some databases
+    #: (PostgreSQL, Oracle, SQL Server) and must be kept out of the
+    #: ``distinct()`` queries used to populate ``list_filter``.
+    NON_DISTINCT_FIELDS: typing.ClassVar[tuple[type[AnyField], ...]] = (
+        models.TextField,
+        models.JSONField,
+        models.BinaryField,
+        models.FileField,
+    )
+
     def _collect_list_filter(
         self, qs: models.QuerySet[models.Model], field_names: list[str]
     ) -> None:
         threshold = self.list_filter_threshold + 1
         for field in field_names:
+            if isinstance(
+                self.model._meta.get_field(field), self.NON_DISTINCT_FIELDS
+            ):
+                continue
             distinct_count = len(qs.only(field).distinct()[:threshold])
             if distinct_count <= self.list_filter_threshold:
                 self.list_filter.append(field)
