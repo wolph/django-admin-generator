@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [master, develop]
   pull_request:
   workflow_dispatch:
   # Allows publish.yml to run the full test suite as a release gate.
