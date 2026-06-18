@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master, develop]
+    branches: [main, master, develop]
   pull_request:
   workflow_dispatch:
   # Allows publish.yml to run the full test suite as a release gate.
@@ -34,7 +34,7 @@ jobs:
             django-version: django60
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7.6.0
         with:
           activate-environment: true
           python-version: ${{ matrix.python-version }}
@@ -55,7 +55,7 @@ jobs:
     needs: [test, docs]
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7.6.0
         with:
           activate-environment: true
       - name: Install tox
@@ -73,7 +73,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7.6.0
         with:
           activate-environment: true
       - name: Install tox
@@ -86,7 +86,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7.6.0
         with:
           activate-environment: true
       - name: Install tox
@@ -99,7 +99,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7
+      - uses: astral-sh/setup-uv@v7.6.0
         with:
           activate-environment: true
       - name: Install tox
