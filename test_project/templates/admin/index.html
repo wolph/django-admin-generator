@@ -1,0 +1,141 @@
+{% extends "admin/index.html" %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  .dag-demo {
+    max-width: 1040px;
+    margin: 0 0 28px;
+    border: 1px solid var(--hairline-color, #e5e5e5);
+    border-left: 4px solid var(--primary, #417690);
+    border-radius: 6px;
+    color: var(--body-fg, #333);
+    background: transparent;
+    overflow: hidden;
+  }
+  .dag-demo__head {
+    background: var(--primary, #417690);
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .dag-demo__body { padding: 18px 22px; }
+  .dag-demo p { max-width: 78ch; line-height: 1.55; margin: 0 0 12px; }
+  .dag-demo h3 {
+    margin: 20px 0 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--body-quiet-color, #666);
+  }
+  .dag-demo ol { max-width: 78ch; line-height: 1.7; margin: 0; padding-left: 22px; }
+  .dag-demo code {
+    background: var(--darkened-bg, #f2f5f7);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .dag-demo table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  .dag-demo th, .dag-demo td {
+    text-align: left;
+    padding: 9px 12px;
+    vertical-align: top;
+    border-top: 1px solid var(--hairline-color, #eee);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  .dag-demo th:first-child, .dag-demo td:first-child { white-space: nowrap; }
+  .dag-demo td:last-child { width: 99%; }
+  .dag-demo thead th {
+    border-top: 0;
+    background: var(--darkened-bg, #f2f5f7);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: .04em;
+    color: var(--body-quiet-color, #555);
+  }
+  .dag-demo tbody tr:hover { background: var(--darkened-bg, #f6fafc); }
+  .dag-demo__foot {
+    margin: 14px 0 0;
+    color: var(--body-quiet-color, #666);
+    font-size: 12px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dag-demo">
+  <div class="dag-demo__head">👋 Django Admin Generator — live demo</div>
+  <div class="dag-demo__body">
+    <p>
+      Everything under <strong>BLOG</strong> below was scaffolded automatically
+      by <code>django-admin-generator</code>. It introspects your models and
+      writes a ready-to-use <code>admin.py</code> —
+      <code>list_display</code>, <code>list_filter</code>,
+      <code>search_fields</code>, <code>raw_id_fields</code>,
+      <code>date_hierarchy</code>, <code>prepopulated_fields</code> and
+      autocomplete — so you don't have to.
+    </p>
+
+    <h3>Try it yourself (3 steps)</h3>
+    <ol>
+      <li>Add <code>django_admin_generator</code> to <code>INSTALLED_APPS</code>.</li>
+      <li>Run <code>python manage.py admin_generator blog -p slug=title --write</code>
+          (<code>-p slug=title</code> prepopulates Post slugs from the title).</li>
+      <li>Reload this page — your admin is done. (Re-run with <code>--force</code>
+          to overwrite.)</li>
+    </ol>
+
+    <h3>What was generated, and why</h3>
+    <table>
+      <thead>
+        <tr><th>See it here</th><th>Generated option</th><th>Heuristic</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="{% url 'admin:blog_post_changelist' %}">Posts</a></td>
+          <td><code>date_hierarchy</code> + <code>list_filter</code></td>
+          <td>DateField named <code>created_at</code> → drill-down bar;
+              Date/Boolean/FK fields → filters.</td>
+        </tr>
+        <tr>
+          <td><a href="{% url 'admin:blog_post_add' %}">Add a Post</a></td>
+          <td><code>prepopulated_fields</code> + autocomplete</td>
+          <td>Type a title → <code>slug</code> auto-fills;
+              <code>tags</code> (M2M) uses an autocomplete widget.</td>
+        </tr>
+        <tr>
+          <td><a href="{% url 'admin:blog_comment_changelist' %}">Comments</a></td>
+          <td><code>raw_id_fields</code></td>
+          <td><code>post</code> is an FK to a table with &gt;100 rows → a lookup
+              popup, not a giant dropdown.</td>
+        </tr>
+        <tr>
+          <td><a href="{% url 'admin:blog_tag_changelist' %}">Tags</a></td>
+          <td>no <code>list_filter</code></td>
+          <td>120 tags exceed the filter threshold (25), so no useless
+              high-cardinality filter is added.</td>
+        </tr>
+        <tr>
+          <td><a href="{% url 'admin:blog_author_changelist' %}">Authors</a></td>
+          <td><code>search_fields</code>; TextField skipped</td>
+          <td><code>name</code>/<code>slug</code> → search;
+              <code>bio</code> (TextField) is shown but never filtered.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="dag-demo__foot">
+      The annotated source is in <code>blog/admin.py</code>. See
+      <a href="https://github.com/WoLpH/django-admin-generator/">the docs</a>
+      for all options (thresholds, reversion, JSON widget, …).
+    </p>
+  </div>
+</div>
+{{ block.super }}
+{% endblock %}
