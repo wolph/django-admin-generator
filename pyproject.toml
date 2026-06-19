@@ -4,7 +4,7 @@ build-backend = 'uv_build'
 
 [project]
 name = 'django-admin-generator'
-version = '2.6.0'
+version = '3.0.0'
 description = 'Django Admin Generator is a management command to automatically generate a Django `admin.py` file for given apps/models.'
 readme = 'README.md'
 license = 'BSD-3-Clause'
