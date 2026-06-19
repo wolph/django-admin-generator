@@ -49,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Demo-only: auto-login as the seeded superuser (no login step).
+    'test_project.blog.middleware.AutoLoginMiddleware',
 ]
 
 ROOT_URLCONF = 'test_project.urls'
