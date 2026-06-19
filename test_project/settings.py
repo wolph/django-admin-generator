@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'test_project.test_app',
+    'test_project.blog',
     'django_admin_generator',
 ]
 
@@ -49,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Demo-only: auto-login as the seeded superuser (no login step).
+    'test_project.blog.middleware.AutoLoginMiddleware',
 ]
 
 ROOT_URLCONF = 'test_project.urls'
@@ -56,7 +58,7 @@ ROOT_URLCONF = 'test_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'test_project', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,19 +91,19 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.'
-                'UserAttributeSimilarityValidator',
+        'UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.'
-                'MinimumLengthValidator',
+        'MinimumLengthValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.'
-                'CommonPasswordValidator',
+        'CommonPasswordValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.'
-                'NumericPasswordValidator',
+        'NumericPasswordValidator',
     },
 ]
 
@@ -114,8 +116,6 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 

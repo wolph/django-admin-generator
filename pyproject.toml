@@ -1,0 +1,162 @@
+[build-system]
+requires = ['uv_build>=0.11.0,<0.12']
+build-backend = 'uv_build'
+
+[project]
+name = 'django-admin-generator'
+version = '3.0.0'
+description = 'Django Admin Generator is a management command to automatically generate a Django `admin.py` file for given apps/models.'
+readme = 'README.md'
+license = 'BSD-3-Clause'
+license-files = ['LICENSE']
+requires-python = '>=3.10'
+authors = [{ name = 'Rick van Hattem', email = 'Wolph@Wol.ph' }]
+keywords = ['django', 'admin', 'generator', 'scaffold']
+classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Environment :: Web Environment',
+    'Framework :: Django',
+    'Framework :: Django :: 4.2',
+    'Framework :: Django :: 5.0',
+    'Framework :: Django :: 5.1',
+    'Framework :: Django :: 5.2',
+    'Intended Audience :: Developers',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Typing :: Typed',
+]
+dependencies = [
+    'django-utils2>=2.12.1',
+    'python-utils>=3.5.2',
+]
+
+[project.urls]
+Homepage = 'https://github.com/WoLpH/django-admin-generator/'
+Documentation = 'https://django-admin-generator.readthedocs.io/'
+Source = 'https://github.com/WoLpH/django-admin-generator/'
+'Bug Reports' = 'https://github.com/WoLpH/django-admin-generator/issues'
+
+[project.optional-dependencies]
+docs = [
+    'sphinx>=7',
+    'django>=4.2',
+]
+tests = [
+    'pytest>=8',
+    'pytest-cov>=5',
+    'pytest-django>=4.8',
+    'coverage>=7',
+    'django>=4.2',
+]
+dev = [
+    'django-admin-generator[tests]',
+    'ruff>=0.15.0',
+    'mypy>=1.10',
+    'django-stubs[compatible-mypy]>=5.0',
+    'pyright>=1.1',
+    'pyrefly>=0.1',
+]
+tox = [
+    'tox>=4.0',
+    'tox-uv>=1.0',
+    'tox-gh-actions>=3.0',
+]
+demo = [
+    'django>=4.2',
+]
+
+[tool.uv.build-backend]
+module-root = ''
+module-name = 'django_admin_generator'
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = 'test_project.settings'
+pythonpath = ['.']
+python_files = ['test_*.py', '*_tests.py']
+testpaths = ['test_project']
+addopts = [
+    '--cov=django_admin_generator',
+    '--cov-report=term-missing',
+    '--cov-report=html',
+    '--no-cov-on-fail',
+    '--basetemp=tmp',
+]
+
+[tool.coverage.run]
+source = ['django_admin_generator']
+branch = true
+parallel = true
+omit = ['*/__about__.py']
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+exclude_lines = [
+    'pragma: no cover',
+    'def __repr__',
+    'if self.debug:',
+    'if settings.DEBUG',
+    'if (?:typing\.)?TYPE_CHECKING:',
+    'raise AssertionError',
+    'raise NotImplementedError',
+    'if 0:',
+    'if __name__ == .__main__.:',
+    '@overload',
+]
+
+[tool.coverage.paths]
+source = ['django_admin_generator']
+
+[tool.mypy]
+python_version = '3.10'
+strict = true
+packages = ['django_admin_generator']
+plugins = ['mypy_django_plugin.main']
+local_partial_types = true
+enable_error_code = [
+    'ignore-without-code',
+    'redundant-expr',
+    'truthy-bool',
+]
+warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = ['django_utils.*', 'django_json_widget.*', 'reversion.*']
+ignore_missing_imports = true
+
+# test_project is the Django test harness, not shipped code. The django-stubs
+# plugin imports its settings, so keep it importable but do not strict-check it.
+[[tool.mypy.overrides]]
+module = ['test_project.*']
+ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = 'test_project.settings'
+
+[tool.pyright]
+pythonPlatform = 'All'
+include = ['django_admin_generator']
+ignore = ['.venv']
+typeCheckingMode = 'strict'
+reportPrivateUsage = false # dupe of ruff PLC2701
+reportUnusedVariable = false # dupe of ruff F841
+reportMissingTypeStubs = false
+# django-stubs leaves many ORM generics as `Unknown` (e.g.
+# `ManyToManyField[Unknown, Unknown]`); these flag stub gaps, not real bugs.
+# mypy --strict remains the real-bug gate.
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownLambdaType = false
+
+[tool.pyrefly]
+project-includes = ['django_admin_generator']
+ignore-missing-imports = ['django_utils']
