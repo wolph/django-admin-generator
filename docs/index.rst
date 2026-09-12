@@ -9,6 +9,12 @@ Contents:
    usage
    django_admin_generator
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Project
+
+   sponsor
+
 Indices and tables
 ==================
 
