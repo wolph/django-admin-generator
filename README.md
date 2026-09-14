@@ -1,10 +1,10 @@
 # Django Admin Generator
 
-[![CI on master](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml?query=branch%3Amaster)
-[![Coverage on master](https://coveralls.io/repos/github/wolph/django-admin-generator/badge.svg?branch=master)](https://coveralls.io/github/wolph/django-admin-generator?branch=master)
-[![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg?style=plastic)](https://pypi.org/project/django-admin-generator/)
-[![Python versions](https://img.shields.io/pypi/pyversions/django-admin-generator.svg?style=plastic)](https://pypi.org/project/django-admin-generator/)
-[![Documentation Status](https://img.shields.io/readthedocs/django-admin-generator/latest?style=plastic)](https://django-admin-generator.readthedocs.io/en/latest/)
+[![CI on master](https://img.shields.io/github/actions/workflow/status/wolph/django-admin-generator/ci.yml?branch=master&label=CI&style=flat-square&labelColor=555)](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Coverage on master](https://img.shields.io/coverallsCoverage/github/wolph/django-admin-generator?branch=master&style=flat-square&labelColor=555)](https://coveralls.io/github/wolph/django-admin-generator?branch=master)
+[![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg?style=flat-square&labelColor=555&color=007ec6)](https://pypi.org/project/django-admin-generator/)
+[![Python versions](https://img.shields.io/pypi/pyversions/django-admin-generator.svg?style=flat-square&labelColor=555&color=007ec6)](https://pypi.org/project/django-admin-generator/)
+[![Documentation Status](https://img.shields.io/readthedocs/django-admin-generator/latest?style=flat-square&labelColor=555)](https://django-admin-generator.readthedocs.io/en/latest/)
 
 The Django Admin Generator is a project which can automatically generate
 (scaffold) a Django Admin for you. By doing this it will introspect your
