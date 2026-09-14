@@ -17,10 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      # Checking out with the deploy key means the probe below exercises the
+      # exact credential sync-master will push with. A revoked or malformed key
+      # fails here, before anything reaches PyPI, instead of after.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
-          persist-credentials: false
+          ssh-key: ${{ secrets.SYNC_MASTER_SSH_KEY }}
+          persist-credentials: true # zizmor: ignore[artipacked] -- the probe below needs the key, no artefacts uploaded
       - name: Verify the tag matches pyproject.toml
         run: |
           version="${GITHUB_REF_NAME#v}"
@@ -30,29 +34,19 @@ jobs:
               "version $project_version" >&2
             exit 1
           fi
-      - name: Verify master can fast-forward to this tag
+      # --dry-run authenticates and negotiates the ref update without making
+      # it, so this catches both a key that cannot push and a master that has
+      # diverged. The explicit ancestor check runs first only to turn the
+      # second case into a sentence rather than git's fast-forward hint.
+      - name: Verify the deploy key can fast-forward master
         run: |
           git fetch origin master
           if ! git merge-base --is-ancestor origin/master "$GITHUB_SHA"; then
-            echo "master has diverged from this tag; sync-master would" \
+            echo "master has diverged from this tag, so sync-master would" \
               "fail after publishing. Reconcile master first." >&2
             exit 1
           fi
-      # An expired or rotated PAT would otherwise surface only in sync-master,
-      # after the package is already on PyPI. This probes liveness and Contents
-      # write only: the Workflows-write grant cannot be checked in advance,
-      # because the rejection happens server-side at push time. Keep that
-      # permission when rotating the token or sync-master fails on any release
-      # whose diff touches workflow files.
-      - name: Verify the SYNC_MASTER_TOKEN can push
-        env:
-          GH_TOKEN: ${{ secrets.SYNC_MASTER_TOKEN }}
-        run: |
-          push="$(gh api "repos/${GITHUB_REPOSITORY}" --jq '.permissions.push')"
-          if [ "$push" != 'true' ]; then
-            echo "SYNC_MASTER_TOKEN is missing, expired or cannot push" >&2
-            exit 1
-          fi
+          git push --dry-run origin "HEAD:master"
 
   # Tag pushes do not trigger ci.yml on their own; run the full test
   # suite here so nothing reaches PyPI without passing tests.
@@ -120,19 +114,21 @@ jobs:
   # non-fast-forward updates, so a diverged master fails this job loudly
   # instead of being overwritten.
   #
-  # Uses the SYNC_MASTER_TOKEN fine-grained PAT (Contents + Workflows write)
-  # because GITHUB_TOKEN is forbidden from pushing commits that touch
-  # .github/workflows/, which any release including workflow changes does.
+  # Pushes over a write-enabled SSH deploy key (SYNC_MASTER_SSH_KEY) rather
+  # than GITHUB_TOKEN, which is forbidden from pushing commits that touch
+  # .github/workflows/ and so would fail on any release whose diff includes a
+  # workflow change. A deploy key carries no such restriction and is scoped to
+  # this repository alone.
   sync-master:
     needs: publish
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      # Only this job pushes. The token is removed by checkout's cleanup.
+      # Only this job pushes. The key is removed by checkout's cleanup.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
-          token: ${{ secrets.SYNC_MASTER_TOKEN }}
+          ssh-key: ${{ secrets.SYNC_MASTER_SSH_KEY }}
           persist-credentials: true # zizmor: ignore[artipacked] -- required for the fast-forward push, no artefacts uploaded
       # master tracks stable releases only. A pre-release tag (v3.1.0rc1) may
       # publish to PyPI, but fast-forwarding master past the latest stable
