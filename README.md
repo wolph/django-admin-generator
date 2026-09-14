@@ -2,13 +2,13 @@
 
 <p align="center"><strong>Scaffold a complete, sensible Django admin for your models in one command.</strong></p>
 
-[![CI on master](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml?query=branch%3Amaster)
-[![Coverage on master](https://coveralls.io/repos/github/wolph/django-admin-generator/badge.svg?branch=master)](https://coveralls.io/github/wolph/django-admin-generator?branch=master)
-[![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg?style=plastic)](https://pypi.org/project/django-admin-generator/)
-[![Python versions](https://img.shields.io/pypi/pyversions/django-admin-generator.svg?style=plastic)](https://pypi.org/project/django-admin-generator/)
-[![Monthly downloads](https://static.pepy.tech/badge/django-admin-generator/month)](https://pepy.tech/projects/django-admin-generator)
-[![Documentation](https://img.shields.io/readthedocs/django-admin-generator/latest?style=plastic)](https://django-admin-generator.readthedocs.io/en/latest/)
-[![License](https://img.shields.io/pypi/l/django-admin-generator.svg?style=plastic)](https://github.com/WoLpH/django-admin-generator/blob/develop/LICENSE)
+[![CI on master](https://img.shields.io/github/actions/workflow/status/wolph/django-admin-generator/ci.yml?branch=master&label=CI&style=flat-square&labelColor=555)](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Coverage on master](https://img.shields.io/coverallsCoverage/github/wolph/django-admin-generator?branch=master&style=flat-square&labelColor=555)](https://coveralls.io/github/wolph/django-admin-generator?branch=master)
+[![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg?style=flat-square&labelColor=555&color=007ec6)](https://pypi.org/project/django-admin-generator/)
+[![Python versions](https://img.shields.io/pypi/pyversions/django-admin-generator.svg?style=flat-square&labelColor=555&color=007ec6)](https://pypi.org/project/django-admin-generator/)
+[![Monthly downloads](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fapi.pepy.tech%2Fbadge%2Fdjango-admin-generator%2Fmonth&query=%28%2F%2F%2A%5Blocal-name%28%29%3D%22text%22%5D%29%5Blast%28%29%5D&label=downloads%2Fmonth&style=flat-square&labelColor=555&color=007ec6)](https://pepy.tech/projects/django-admin-generator)
+[![Documentation](https://img.shields.io/readthedocs/django-admin-generator/latest?style=flat-square&labelColor=555)](https://django-admin-generator.readthedocs.io/en/latest/)
+[![License](https://img.shields.io/pypi/l/django-admin-generator.svg?style=flat-square&labelColor=555&color=007ec6)](https://github.com/WoLpH/django-admin-generator/blob/develop/LICENSE)
 
 `django-admin-generator` is a management command that introspects your models
 and writes a ready-to-use `admin.py`: `list_display`, `list_filter`,
