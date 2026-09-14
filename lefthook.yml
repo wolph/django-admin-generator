@@ -1,16 +1,22 @@
 # Pre-commit hooks for django-admin-generator development
 # Install: brew install lefthook && lefthook install
 # Or: pip install lefthook && lefthook install
+#
+# Everything runs through `uv run --extra dev`, which resolves the project's own
+# environment and installs the checkers if they are missing. A bare `ruff` or
+# `pyrefly` picks up whatever virtualenv happens to be active, and a shell
+# pointed at another project fails the hook with a wall of missing-import
+# errors.
 
 pre-commit:
   parallel: true
   commands:
     ruff-check:
       glob: '*.py'
-      run: uv run ruff check {staged_files}
+      run: uv run --extra dev ruff check {staged_files}
     ruff-format:
       glob: '*.py'
-      run: uv run ruff format {staged_files}
+      run: uv run --extra dev ruff format {staged_files}
       stage_fixed: true
     type-check:
-      run: uv run pyrefly check
+      run: uv run --extra dev pyrefly check

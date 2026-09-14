@@ -8,42 +8,84 @@ on:
   # Allows publish.yml to run the full test suite as a release gate.
   workflow_call:
 
+permissions:
+  contents: read
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # One job per tox env that does not need the test matrix. Keeping them in a
+  # matrix means a single place to add the next checker.
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [lint, mypy, pyright, pyrefly, docs]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        with:
+          activate-environment: true
+          python-version: '3.13'
+      - name: Install tox
+        run: uv pip install '.[tox]'
+      - name: Run tox
+        env:
+          TOX_ENV: ${{ matrix.env }}
+        run: tox -e "$TOX_ENV"
+
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13']
-        django-version: [django42, django50, django51, django52, django60]
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        django-version: [django42, django50, django51, django52, django60, django61]
         exclude:
-          # Django 4.2 / 5.0 do not support Python 3.13.
+          # Django 6.0 and 6.1 require Python 3.12+.
+          - python-version: '3.10'
+            django-version: django60
+          - python-version: '3.10'
+            django-version: django61
+          - python-version: '3.11'
+            django-version: django60
+          - python-version: '3.11'
+            django-version: django61
+          # Django 4.2 and 5.0 do not support Python 3.13.
           - python-version: '3.13'
             django-version: django42
           - python-version: '3.13'
             django-version: django50
-          # Django 6.0 requires Python 3.12+.
-          - python-version: '3.10'
-            django-version: django60
-          - python-version: '3.11'
-            django-version: django60
+          # Only Django 5.2+ supports Python 3.14.
+          - python-version: '3.14'
+            django-version: django42
+          - python-version: '3.14'
+            django-version: django50
+          - python-version: '3.14'
+            django-version: django51
     steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7.6.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
         with:
           activate-environment: true
           python-version: ${{ matrix.python-version }}
       - name: Install tox
         run: uv pip install '.[tox]'
       - name: Run tests
-        run: tox -e py$(echo "${{ matrix.python-version }}" | tr -d .)-${{ matrix.django-version }}
-      - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        env:
+          PYTHON_VERSION: ${{ matrix.python-version }}
+          DJANGO_VERSION: ${{ matrix.django-version }}
+        run: tox -e "py${PYTHON_VERSION//./}-${DJANGO_VERSION}"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: coverage-${{ matrix.python-version }}-${{ matrix.django-version }}
           path: .tox/.coverage.*
@@ -52,15 +94,18 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [test, docs]
+    needs: [test, checks]
     steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7.6.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
         with:
           activate-environment: true
+          python-version: '3.13'
       - name: Install tox
         run: uv pip install '.[tox]'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           pattern: coverage-*
           path: .tox
@@ -68,41 +113,17 @@ jobs:
       - name: Combine coverage and check threshold
         run: tox -e coverage
 
-  lint:
+  zizmor:
+    name: Workflow security
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7.6.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          activate-environment: true
-      - name: Install tox
-        run: uv pip install '.[tox]'
-      - name: Lint
-        run: tox -e lint
-
-  type-check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7.6.0
+          persist-credentials: false
+      - uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
         with:
-          activate-environment: true
-      - name: Install tox
-        run: uv pip install '.[tox]'
-      - name: Type-check (mypy, pyright, pyrefly)
-        run: tox -e mypy,pyright,pyrefly
-
-  docs:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7.6.0
-        with:
-          activate-environment: true
-      - name: Install tox
-        run: uv pip install '.[tox]'
-      - name: Build docs
-        run: tox -e docs
+          inputs: .github/workflows
+          online-audits: false
+          advanced-security: false
+          annotations: true

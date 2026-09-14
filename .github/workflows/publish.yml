@@ -1,40 +1,92 @@
-name: Publish to PyPI
+name: Publish to PyPI and GitHub releases
 
 on:
   push:
     tags:
       - 'v*'
 
+permissions:
+  contents: read
+
 jobs:
+  # Fail the release before anything reaches PyPI. A tag that disagrees with
+  # pyproject.toml used to surface only after the upload, which leaves a
+  # half-finished release behind. A red preflight stops the run while
+  # re-tagging is still cheap.
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Verify the tag matches pyproject.toml
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          project_version="$(sed -n "s/^version = '\(.*\)'$/\1/p" pyproject.toml)"
+          if [ "$version" != "$project_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match pyproject.toml" \
+              "version $project_version" >&2
+            exit 1
+          fi
+
   # Tag pushes do not trigger ci.yml on their own; run the full test
   # suite here so nothing reaches PyPI without passing tests.
   test:
-    uses: ./.github/workflows/ci.yml
+    uses: ./.github/workflows/ci.yml # zizmor: ignore[self-repository] -- retain standard reusable-workflow syntax
 
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7.6.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          activate-environment: true
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+        with:
+          enable-cache: false
       - name: Build
         run: uv build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: dist
           path: dist/
 
   publish:
-    needs: [test, build]
+    needs: [preflight, test, build]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment: pypi
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: dist
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      # skip-existing makes a tag re-push idempotent: without it a re-run
+      # dies on the PyPI duplicate-file error before the release job gets a
+      # second chance.
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+        with:
+          skip-existing: true
+
+  # The GitHub release used to be a manual step and was silently skipped when
+  # forgotten; create one here so a tag push publishes everywhere at once.
+  release:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME"
+          --generate-notes --verify-tag
