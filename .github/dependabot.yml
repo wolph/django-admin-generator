@@ -1,3 +1,9 @@
+# Every entry targets develop, and the repository default branch is
+# develop too. Both matter: without target-branch Dependabot opens against
+# the default branch, and its security updates always use the default
+# branch whatever target-branch says. A Dependabot commit landing on master
+# diverges it from develop and blocks the sync-master fast-forward in
+# publish.yml. The repo-config job in ci.yml fails if either drifts.
 version: 2
 updates:
   - package-ecosystem: github-actions
