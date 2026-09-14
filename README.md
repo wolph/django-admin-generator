@@ -1,6 +1,7 @@
 # Django Admin Generator
 
-[![CI](https://github.com/WoLpH/django-admin-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/WoLpH/django-admin-generator/actions/workflows/ci.yml)
+[![CI on master](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Coverage on master](https://coveralls.io/repos/github/WoLpH/django-admin-generator/badge.svg?branch=master)](https://coveralls.io/github/WoLpH/django-admin-generator?branch=master)
 [![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg)](https://pypi.org/project/django-admin-generator/)
 [![Python versions](https://img.shields.io/pypi/pyversions/django-admin-generator.svg)](https://pypi.org/project/django-admin-generator/)
 [![Documentation Status](https://readthedocs.org/projects/django-admin-generator/badge/?version=latest)](https://django-admin-generator.readthedocs.io/en/latest/)
