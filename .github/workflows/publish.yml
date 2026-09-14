@@ -19,6 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          fetch-depth: 0
           persist-credentials: false
       - name: Verify the tag matches pyproject.toml
         run: |
@@ -27,6 +28,29 @@ jobs:
           if [ "$version" != "$project_version" ]; then
             echo "Tag $GITHUB_REF_NAME does not match pyproject.toml" \
               "version $project_version" >&2
+            exit 1
+          fi
+      - name: Verify master can fast-forward to this tag
+        run: |
+          git fetch origin master
+          if ! git merge-base --is-ancestor origin/master "$GITHUB_SHA"; then
+            echo "master has diverged from this tag; sync-master would" \
+              "fail after publishing. Reconcile master first." >&2
+            exit 1
+          fi
+      # An expired or rotated PAT would otherwise surface only in sync-master,
+      # after the package is already on PyPI. This probes liveness and Contents
+      # write only: the Workflows-write grant cannot be checked in advance,
+      # because the rejection happens server-side at push time. Keep that
+      # permission when rotating the token or sync-master fails on any release
+      # whose diff touches workflow files.
+      - name: Verify the SYNC_MASTER_TOKEN can push
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_MASTER_TOKEN }}
+        run: |
+          push="$(gh api "repos/${GITHUB_REPOSITORY}" --jq '.permissions.push')"
+          if [ "$push" != 'true' ]; then
+            echo "SYNC_MASTER_TOKEN is missing, expired or cannot push" >&2
             exit 1
           fi
 
@@ -90,3 +114,36 @@ jobs:
         run: >-
           gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME"
           --generate-notes --verify-tag
+
+  # Keep master pointing at the latest release. Like the GitHub release, this
+  # used to be a manual step and was silently skipped. A plain push refuses
+  # non-fast-forward updates, so a diverged master fails this job loudly
+  # instead of being overwritten.
+  #
+  # Uses the SYNC_MASTER_TOKEN fine-grained PAT (Contents + Workflows write)
+  # because GITHUB_TOKEN is forbidden from pushing commits that touch
+  # .github/workflows/, which any release including workflow changes does.
+  sync-master:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Only this job pushes. The token is removed by checkout's cleanup.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_MASTER_TOKEN }}
+          persist-credentials: true # zizmor: ignore[artipacked] -- required for the fast-forward push, no artefacts uploaded
+      # master tracks stable releases only. A pre-release tag (v3.1.0rc1) may
+      # publish to PyPI, but fast-forwarding master past the latest stable
+      # release would present the rc as the current state.
+      - name: Fast-forward master to the release tag
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          case "$version" in
+            *[!0-9.]*)
+              echo "Pre-release tag $GITHUB_REF_NAME, leaving master alone"
+              exit 0
+              ;;
+          esac
+          git push origin HEAD:master
