@@ -4,11 +4,11 @@
 
 [![CI on master](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/wolph/django-admin-generator/actions/workflows/ci.yml?query=branch%3Amaster)
 [![Coverage on master](https://coveralls.io/repos/github/wolph/django-admin-generator/badge.svg?branch=master)](https://coveralls.io/github/wolph/django-admin-generator?branch=master)
-[![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg)](https://pypi.org/project/django-admin-generator/)
-[![Python versions](https://img.shields.io/pypi/pyversions/django-admin-generator.svg)](https://pypi.org/project/django-admin-generator/)
-[![Downloads](https://img.shields.io/pypi/dm/django-admin-generator.svg)](https://pypi.org/project/django-admin-generator/)
-[![Documentation](https://readthedocs.org/projects/django-admin-generator/badge/?version=latest)](https://django-admin-generator.readthedocs.io/en/latest/)
-[![License](https://img.shields.io/pypi/l/django-admin-generator.svg)](https://github.com/WoLpH/django-admin-generator/blob/develop/LICENSE)
+[![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg?style=plastic)](https://pypi.org/project/django-admin-generator/)
+[![Python versions](https://img.shields.io/pypi/pyversions/django-admin-generator.svg?style=plastic)](https://pypi.org/project/django-admin-generator/)
+[![Monthly downloads](https://static.pepy.tech/badge/django-admin-generator/month)](https://pepy.tech/projects/django-admin-generator)
+[![Documentation](https://img.shields.io/readthedocs/django-admin-generator/latest?style=plastic)](https://django-admin-generator.readthedocs.io/en/latest/)
+[![License](https://img.shields.io/pypi/l/django-admin-generator.svg?style=plastic)](https://github.com/WoLpH/django-admin-generator/blob/develop/LICENSE)
 
 `django-admin-generator` is a management command that introspects your models
 and writes a ready-to-use `admin.py`: `list_display`, `list_filter`,
