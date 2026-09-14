@@ -25,7 +25,7 @@ from django_admin_generator.discovery import get_apps, get_local_apps
 from django_admin_generator.generators import AdminApp
 
 
-class Command(base_command.CustomBaseCommand):  # type: ignore[misc]
+class Command(base_command.CustomBaseCommand):
     help = """Generate a `admin.py` file for the given app (models)"""
     can_import_settings = True
     requires_system_checks = ('__all__',)
@@ -176,8 +176,12 @@ class Command(base_command.CustomBaseCommand):  # type: ignore[misc]
             'many-to-many fields',
         )
 
-    def warning(
-        self,
+    # `LoggerBase.warning` is a real classmethod, so mypy requires this
+    # override to be one too. Pyright disagrees because python-utils wraps it
+    # in `wraps_classmethod`, whose return type erases the classmethod-ness.
+    @classmethod
+    def warning(  # pyright: ignore[reportIncompatibleMethodOverride]
+        cls,
         msg: object,
         *args: object,
         exc_info: logger._ExcInfoType = None,
