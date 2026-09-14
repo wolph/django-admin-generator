@@ -20,21 +20,27 @@ classifiers = [
     'Framework :: Django :: 5.0',
     'Framework :: Django :: 5.1',
     'Framework :: Django :: 5.2',
+    'Framework :: Django :: 6.0',
+    'Framework :: Django :: 6.1',
     'Intended Audience :: Developers',
     'Natural Language :: English',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Typing :: Typed',
 ]
 dependencies = [
-    'django-utils2>=2.12.1',
-    'python-utils>=3.5.2',
+    # 4.1.2 is the first release shipping `py.typed`.
+    'django-utils2>=4.1.2',
+    # 4.0 turned the `LoggerBase` log methods into classmethods.
+    'python-utils>=4.0.1',
 ]
 
 [project.urls]
@@ -47,6 +53,7 @@ Funding = 'https://github.com/sponsors/wolph'
 [project.optional-dependencies]
 docs = [
     'sphinx>=7',
+    'furo>=2024.1.29',
     'django>=4.2',
 ]
 tests = [
@@ -161,3 +168,8 @@ reportUnknownLambdaType = false
 [tool.pyrefly]
 project-includes = ['django_admin_generator']
 ignore-missing-imports = ['django_utils']
+
+[tool.uv]
+# Ignore releases younger than this when resolving. A fresh upstream
+# release then cannot break CI before we have had a look at it.
+exclude-newer = '14 days'
