@@ -8,6 +8,9 @@ dist/
 .venv/
 venv/
 
+# Docs build output
+docs/_build/
+
 # Tooling caches
 .tox/
 .ruff_cache/

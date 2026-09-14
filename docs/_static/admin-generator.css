@@ -1,0 +1,183 @@
+.sidebar-logo {
+  width: 240px;
+  max-width: 100%;
+}
+
+.dag-links,
+.dag-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-size: 0.875rem;
+}
+
+.dag-links {
+  margin: 0.5rem 0 2.5rem;
+}
+
+.dag-eyebrow {
+  color: var(--color-brand-content);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+section:has(> .dag-hero) > h1 {
+  max-width: 18ch;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  margin-bottom: 1.5rem;
+}
+
+[role="main"] .dag-hero {
+  position: relative;
+  margin-bottom: 3.5rem;
+  padding-right: 155px;
+}
+
+.dag-hero::after {
+  position: absolute;
+  right: 0;
+  top: -5.5rem;
+  width: 140px;
+  height: 140px;
+  background: url("favicon.svg") center / contain no-repeat;
+  content: "";
+  pointer-events: none;
+}
+
+body[data-theme="dark"] .dag-hero::after {
+  background-image: url("hero-dark.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) .dag-hero::after {
+    background-image: url("hero-dark.svg");
+  }
+}
+
+.dag-hero > p {
+  color: var(--color-foreground-secondary);
+  font-size: 1.1rem;
+  line-height: 1.65;
+}
+
+.dag-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+a.dag-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--color-brand-primary);
+  border-radius: 5px;
+  background: var(--color-brand-primary);
+  color: var(--color-background-primary);
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+a.dag-button-secondary {
+  background: transparent;
+  color: var(--color-brand-content);
+}
+
+.dag-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+a.dag-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.1rem;
+  border: 1px solid var(--color-background-border);
+  border-radius: 6px;
+  color: var(--color-foreground-primary);
+  text-decoration: none;
+}
+
+.dag-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.dag-card p {
+  margin: 0;
+  color: var(--color-foreground-secondary);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.dag-card > span {
+  margin-top: auto;
+  color: var(--color-brand-content);
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+a.dag-card:hover {
+  border-color: var(--color-brand-primary);
+  background: var(--color-background-secondary);
+}
+
+a.dag-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.dag-links a:focus-visible,
+.dag-actions a:focus-visible,
+.dag-cards a:focus-visible,
+.dag-footer-links a:focus-visible {
+  outline: 3px solid var(--color-brand-primary);
+  outline-offset: 4px;
+}
+
+.dag-footer-links {
+  margin-top: 2.5rem;
+  padding: 1.5rem 0 0.5rem;
+  border-top: 1px solid var(--color-background-border);
+}
+
+[role="main"] img {
+  border: 1px solid var(--color-background-border);
+  border-radius: 6px;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  .dag-links {
+    margin-bottom: 2rem;
+  }
+
+  [role="main"] .dag-hero {
+    padding-right: 0;
+    margin-bottom: 2.5rem;
+  }
+
+  .dag-hero::after {
+    display: none;
+  }
+
+  .dag-cards {
+    grid-template-columns: 1fr;
+  }
+}

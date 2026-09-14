@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="340" height="72" viewBox="0 0 340 72" role="img" aria-labelledby="title">
+  <title id="title">Django Admin Generator</title>
+  <g fill="none" stroke="#0c4b33" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="14" width="46" height="44" rx="7"/>
+    <path d="M9 27h46"/>
+    <path d="M22 27v31"/>
+  </g>
+  <g fill="none" stroke="#44b78b" stroke-width="3.5" stroke-linecap="round">
+    <path d="M31 38h16M31 47h11"/>
+  </g>
+  <g fill="#44b78b">
+    <path d="M60 10l2.2 5.8L68 18l-5.8 2.2L60 26l-2.2-5.8L52 18l5.8-2.2z"/>
+  </g>
+  <text x="82" y="33" fill="#25343b" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="-1">Django Admin</text>
+  <text x="82" y="58" fill="#0c4b33" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="-1">Generator</text>
+</svg>

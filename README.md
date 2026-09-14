@@ -1,6 +1,6 @@
 <h1 align="center">Django Admin Generator</h1>
 
-<p align="center"><strong>Scaffold a complete, sensible Django admin for your models — automatically.</strong></p>
+<p align="center"><strong>Scaffold a complete, sensible Django admin for your models in one command.</strong></p>
 
 [![CI](https://github.com/WoLpH/django-admin-generator/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/WoLpH/django-admin-generator/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/django-admin-generator.svg)](https://pypi.org/project/django-admin-generator/)
@@ -10,14 +10,14 @@
 [![License](https://img.shields.io/pypi/l/django-admin-generator.svg)](https://github.com/WoLpH/django-admin-generator/blob/develop/LICENSE)
 
 `django-admin-generator` is a management command that introspects your models
-and writes a ready-to-use `admin.py` — `list_display`, `list_filter`,
+and writes a ready-to-use `admin.py`: `list_display`, `list_filter`,
 `search_fields`, `raw_id_fields`, `date_hierarchy`, `prepopulated_fields` and
-autocomplete — so you don't have to hand-write any of it.
+autocomplete, so you don't have to hand-write any of it.
 
 ![Auto-generated changelist](https://raw.githubusercontent.com/WoLpH/django-admin-generator/develop/docs/images/changelist.png)
 
-*The list view above — columns, a filter sidebar, and a date drill-down — came
-straight from the models, with zero hand-written admin code.*
+*The list view above, filter sidebar and date drill-down included, came
+straight from the models with no hand-written admin code.*
 
 ## Quick start
 
@@ -32,7 +32,7 @@ and write it to the app's `admin.py`:
 ./manage.py admin_generator <app> --write
 ```
 
-Reload the Django admin — your models are fully wired up.
+Reload the Django admin. Your models are fully wired up.
 
 ## What gets generated
 
@@ -64,8 +64,8 @@ class PostAdmin(ModelAdminBase):
     date_hierarchy = 'created_at'
 ```
 
-…which produces a fully-wired add/change form — prepopulated slugs,
-autocomplete for relations, the right widgets everywhere:
+That produces a fully wired add/change form: prepopulated slugs,
+autocomplete for relations, and the right widgets everywhere:
 
 ![Auto-generated add form](https://raw.githubusercontent.com/WoLpH/django-admin-generator/develop/docs/images/add-form.png)
 
@@ -116,8 +116,8 @@ for a guided tour.
 
 ## Compatibility
 
-- **Python** 3.10 – 3.13
-- **Django** 4.2, 5.0, 5.1, 5.2, 6.0
+- **Python** 3.10 to 3.14
+- **Django** 4.2, 5.0, 5.1, 5.2, 6.0, 6.1
 
 ## Development
 
@@ -152,4 +152,4 @@ If your company funds its dependencies, this package is on
 
 ## License
 
-BSD-3-Clause — see [LICENSE](LICENSE).
+BSD-3-Clause, see [LICENSE](LICENSE).
