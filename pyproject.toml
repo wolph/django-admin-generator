@@ -1,5 +1,5 @@
 [build-system]
-requires = ['uv_build>=0.11.0,<0.12']
+requires = ['uv_build>=0.11.0,<1']
 build-backend = 'uv_build'
 
 [project]
@@ -173,3 +173,10 @@ ignore-missing-imports = ['django_utils']
 # Ignore releases younger than this when resolving. A fresh upstream
 # release then cannot break CI before we have had a look at it.
 exclude-newer = '14 days'
+# certifi, filelock, uv and virtualenv get a shorter soak of one week: their
+# October 2026 advisories (PYSEC-2026-4320 for certifi, GHSA-v4x8-3wr5-3wq8
+# for filelock, GHSA-hq85-5cpj-mr62 for uv, the GHSA-394h-qwmc-48pf series for
+# virtualenv) were fixed eight to eleven days before this release, inside
+# the fourteen-day quarantine, and the Dependabot security job cannot lift the
+# cutoff itself. A week is still long enough to catch a broken release.
+exclude-newer-package = { certifi = '7 days', filelock = '7 days', uv = '7 days', virtualenv = '7 days' }
