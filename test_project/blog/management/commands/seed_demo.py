@@ -8,7 +8,7 @@ data-driven heuristic:
 * a handful of authors/categories (< 25) → ``list_filter``.
 """
 
-import datetime
+import datetime as dt
 import random
 
 from django.contrib.auth import get_user_model
@@ -87,16 +87,16 @@ class Command(BaseCommand):
             for i in range(120)
         ]
 
-        today = datetime.date.today()
+        today = dt.date.today()
         for i in range(150):
             title = f'{random.choice(ADJECTIVES)} {random.choice(TOPICS)} #{i}'
-            created = today - datetime.timedelta(days=i * 2)
+            created = today - dt.timedelta(days=i * 2)
             post = Post.objects.create(
                 title=title,
                 slug=f'{slugify(title)}-{i}',
                 body=f'A demo post about {title.lower()}.\n\n' * 3,
                 created_at=created,
-                published_at=created + datetime.timedelta(days=2),
+                published_at=created + dt.timedelta(days=2),
                 is_published=(i % 5 != 0),
                 author=random.choice(authors),
                 category=random.choice(categories),
@@ -108,7 +108,7 @@ class Command(BaseCommand):
                     body='Great post, thanks for sharing!',
                     post=post,
                     created_at=created
-                    + datetime.timedelta(days=random.randint(1, 10)),
+                    + dt.timedelta(days=random.randint(1, 10)),
                 )
 
         user_model = get_user_model()

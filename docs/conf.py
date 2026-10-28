@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import pathlib
 import sys
 from importlib import metadata
@@ -34,7 +34,7 @@ if not settings.configured:
 project: str = 'Django Admin Generator'
 author: str = 'Rick van Hattem'
 copyright = (  # noqa: A001
-    f'2014-{datetime.datetime.now(tz=datetime.timezone.utc):%Y}, {author}'
+    f'2014-{dt.datetime.now(tz=dt.timezone.utc):%Y}, {author}'
 )
 release: str = metadata.version('django-admin-generator')
 version: str = '.'.join(release.split('.')[:2])
