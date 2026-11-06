@@ -49,6 +49,7 @@ Documentation = 'https://django-admin-generator.readthedocs.io/'
 Source = 'https://github.com/WoLpH/django-admin-generator/'
 'Bug Reports' = 'https://github.com/WoLpH/django-admin-generator/issues'
 Funding = 'https://github.com/sponsors/wolph'
+Changelog = 'https://github.com/wolph/django-admin-generator/releases'
 
 [project.optional-dependencies]
 docs = [
